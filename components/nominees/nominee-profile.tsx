@@ -71,7 +71,7 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
     if (navigator.share) {
       await navigator.share({
         title: `Vota por ${nominee.name}`,
-        text: `¡Vota por ${nominee.name} en la categoría ${category.name} de Armando La Plática!`,
+        text: `¡Vota por ${nominee.name} en la categoría ${category.name} de Clikawards!`,
         url: window.location.href,
       })
     } else {

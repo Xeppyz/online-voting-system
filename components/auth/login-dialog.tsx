@@ -18,10 +18,24 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
     setIsLoading(true)
     const supabase = createClient()
 
+    const getRedirectUrl = () => {
+      let url =
+        process.env.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
+        process.env.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
+        window.location.origin
+
+      // Make sure to include `https://` when not localhost.
+      url = url.includes("http") ? url : `https://${url}`
+      // Make sure to include the trailing `/`.
+      url = url.charAt(url.length - 1) === "/" ? url : `${url}/`
+
+      return `${url}auth/callback`
+    }
+
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/auth/callback`,
+        redirectTo: getRedirectUrl(),
       },
     })
   }
@@ -37,7 +51,7 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
           </div>
           <DialogTitle className="text-xl">Inicia sesión para votar</DialogTitle>
           <DialogDescription>
-            Necesitas una cuenta para participar en las votaciones de Armando La Plática
+            Necesitas una cuenta para participar en las votaciones de Clikawards
           </DialogDescription>
         </DialogHeader>
 

@@ -10,7 +10,7 @@ export function Footer() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-[#00D4FF] flex items-center justify-center">
               <Vote className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-lg text-foreground">Armando La Plática</span>
+            <span className="font-bold text-lg text-foreground">Clikawards</span>
           </div>
 
           <div className="flex items-center gap-6 text-sm text-muted-foreground">
@@ -25,7 +25,7 @@ export function Footer() {
             </Link>
           </div>
 
-          <p className="text-sm text-muted-foreground">© 2025 Armando La Plática. Todos los derechos reservados.</p>
+          <p className="text-sm text-muted-foreground">© 2025 Clikawards. Todos los derechos reservados.</p>
         </div>
       </div>
     </footer>

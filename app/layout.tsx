@@ -8,9 +8,9 @@ const inter = Inter({ subsets: ["latin"] })
 const geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Armando La Plática | Sistema de Votaciones",
+  title: "Clikawards | Sistema de Votaciones",
   description:
-    "Vota por tus favoritos en las diferentes categorías de Armando La Plática. Sistema de votación en línea seguro y en tiempo real.",
+    "Vota por tus favoritos en las diferentes categorías de Clikawards. Sistema de votación en línea seguro y en tiempo real.",
   generator: "v0.app",
   icons: {
     icon: [
@@ -30,7 +30,7 @@ export const metadata: Metadata = {
     apple: "/apple-icon.png",
   },
   openGraph: {
-    title: "Armando La Plática | Sistema de Votaciones",
+    title: "Clikawards | Sistema de Votaciones",
     description: "Vota por tus favoritos en las diferentes categorías",
     type: "website",
   },

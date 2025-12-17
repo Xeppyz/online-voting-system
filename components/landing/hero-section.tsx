@@ -53,10 +53,10 @@ export async function HeroSection() {
 
           {/* Main Title */}
           <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-balance">
-            <span className="text-foreground">Armando</span>
+            <span className="text-foreground">Clik</span>
             <br />
             <span className="bg-gradient-to-r from-primary via-[#3385FF] to-[#00D4FF] bg-clip-text text-transparent">
-              La Plática
+              awards
             </span>
           </h1>
 

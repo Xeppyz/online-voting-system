@@ -44,7 +44,7 @@ export function Navbar() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-[#00D4FF] flex items-center justify-center">
               <Vote className="w-5 h-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-lg text-foreground hidden sm:block">Armando La Plática</span>
+            <span className="font-bold text-lg text-foreground hidden sm:block">Clikawards</span>
           </Link>
 
           {/* Desktop Navigation */}

@@ -17,11 +17,25 @@ export default function LoginPage() {
 
     const supabase = createClient()
 
+    const getRedirectUrl = () => {
+      let url =
+        process.env.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
+        process.env.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
+        window.location.origin
+
+      // Make sure to include `https://` when not localhost.
+      url = url.includes("http") ? url : `https://${url}`
+      // Make sure to include the trailing `/`.
+      url = url.charAt(url.length - 1) === "/" ? url : `${url}/`
+
+      return `${url}auth/callback`
+    }
+
     try {
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: process.env.NEXT_PUBLIC_DEV_SUPABASE_REDIRECT_URL || `${window.location.origin}/auth/callback`,
+          redirectTo: getRedirectUrl(),
         },
       })
 
@@ -85,7 +99,7 @@ export default function LoginPage() {
           </Button>
 
           <p className="text-center text-xs text-muted-foreground">
-            Al continuar, aceptas participar en las votaciones de Armando La Plática
+            Al continuar, aceptas participar en las votaciones de Clikawards
           </p>
 
           <div className="pt-4 text-center">
