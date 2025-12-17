@@ -13,21 +13,8 @@ export const metadata: Metadata = {
     "Vota por tus favoritos en las diferentes categorías de Clikawards. Sistema de votación en línea seguro y en tiempo real.",
   generator: "v0.app",
   icons: {
-    icon: [
-      {
-        url: "/icon-light-32x32.png",
-        media: "(prefers-color-scheme: light)",
-      },
-      {
-        url: "/icon-dark-32x32.png",
-        media: "(prefers-color-scheme: dark)",
-      },
-      {
-        url: "/icon.svg",
-        type: "image/svg+xml",
-      },
-    ],
-    apple: "/apple-icon.png",
+    icon: "/clikawards-icon.svg",
+    apple: "/clikawards-icon.svg",
   },
   openGraph: {
     title: "Clikawards | Sistema de Votaciones",
