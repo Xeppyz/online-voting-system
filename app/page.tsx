@@ -5,6 +5,8 @@ import { HowItWorksSection } from "@/components/landing/how-it-works-section"
 import { Footer } from "@/components/landing/footer"
 import { Navbar } from "@/components/landing/navbar"
 import { TopNomineesSection } from "@/components/landing/top-nominees-section"
+import { VideoSection } from "@/components/landing/video-section"
+import { ScrollAnimation } from "@/components/ui/scroll-animation"
 
 export default async function HomePage() {
   const supabase = await createClient()
@@ -22,47 +24,28 @@ export default async function HomePage() {
     categoryTotalVotes[vote.category_id] = (categoryTotalVotes[vote.category_id] || 0) + 1
   })
 
-  const topNomineeIds: string[] = []
-  const topNomineesStats: Record<string, { count: number; percentage: number }> = {}
+  // Fetch all nominees with their categories
+  const { data: allNominees } = await supabase
+    .from("nominees")
+    .select("*, categories(name, description)")
 
-  Object.keys(categoryVotes).forEach((categoryId) => {
-    const nominees = categoryVotes[categoryId]
-    let maxVotes = -1
-    let winnerId = null
+  // Calculate stats for all nominees
+  let nomineesWithData: any[] = []
 
-    Object.entries(nominees).forEach(([nomineeId, count]) => {
-      if (count > maxVotes) {
-        maxVotes = count
-        winnerId = nomineeId
+  if (allNominees) {
+    nomineesWithData = allNominees.map((nominee) => {
+      const categoryId = nominee.category_id
+      const totalCategoryVotes = categoryTotalVotes[categoryId] || 0
+      const nomineeVotes = categoryVotes[categoryId]?.[nominee.id] || 0
+
+      return {
+        ...nominee,
+        vote_count: nomineeVotes,
+        percentage: totalCategoryVotes > 0 ? Math.round((nomineeVotes / totalCategoryVotes) * 100) : 0,
+        category_name: nominee.categories?.name || "Categoría",
+        category_description: nominee.categories?.description || "",
       }
     })
-
-    if (winnerId) {
-      topNomineeIds.push(winnerId)
-      topNomineesStats[winnerId] = {
-        count: maxVotes,
-        percentage: Math.round((maxVotes / categoryTotalVotes[categoryId]) * 100),
-      }
-    }
-  })
-
-  // Fetch top nominees details
-  let topNomineesWithData: any[] = []
-
-  if (topNomineeIds.length > 0) {
-    const { data: topNominees } = await supabase
-      .from("nominees")
-      .select("*, categories(name)")
-      .in("id", topNomineeIds)
-
-    if (topNominees) {
-      topNomineesWithData = topNominees.map((nominee) => ({
-        ...nominee,
-        vote_count: topNomineesStats[nominee.id].count,
-        percentage: topNomineesStats[nominee.id].percentage,
-        category_name: nominee.categories?.name || "Categoría",
-      }))
-    }
   }
 
   // Get current user's votes
@@ -87,10 +70,25 @@ export default async function HomePage() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <main>
-        <HeroSection />
-        <TopNomineesSection nominees={topNomineesWithData} userVotes={userVotes} userId={user?.id} />
-        <FeaturesSection />
-        <HowItWorksSection />
+        <ScrollAnimation>
+          <HeroSection />
+        </ScrollAnimation>
+
+        <ScrollAnimation>
+          <TopNomineesSection nominees={nomineesWithData} userVotes={userVotes} userId={user?.id} />
+        </ScrollAnimation>
+
+        <ScrollAnimation>
+          <VideoSection />
+        </ScrollAnimation>
+
+        <ScrollAnimation>
+          <FeaturesSection />
+        </ScrollAnimation>
+
+        <ScrollAnimation>
+          <HowItWorksSection />
+        </ScrollAnimation>
       </main>
       <Footer />
     </div>
