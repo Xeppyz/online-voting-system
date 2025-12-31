@@ -45,8 +45,13 @@ export default async function CategoriesPage() {
 
   // Distribuir categorías en sus grupos
   const groupedCategories = groups.map((group) => {
+    // Filtrar categorías que pertenecen explícitamente a este bloque
+    // O fallback al filtro de nombres si no tienen bloque asignado (retrocompatibilidad)
     const groupCategories = categories?.filter((cat) => {
-      // Verificamos si el nombre de la categoría contiene alguna de las palabras clave del filtro
+      if (cat.block) {
+        return cat.block === group.id
+      }
+      // Fallback: Verificamos nombres si no hay bloque asignado
       return group.filter.some((keyword) => normalize(cat.name).includes(normalize(keyword)))
     })
 
@@ -56,15 +61,16 @@ export default async function CategoriesPage() {
     }
   })
 
-  // Categorías que no cayeron en ningún grupo (para no perderlas)
+  // Categorías que no cayeron en ningún grupo (ni por bloque ni por nombre)
   const allGroupedIds = new Set(groupedCategories.flatMap((g) => g.items.map((c) => c.id)))
   const otherCategories = categories?.filter((cat) => !allGroupedIds.has(cat.id)) || []
 
-  // Si hay categorías "huerfanas", las agregamos al grupo con menos elementos o creamos uno "Otros"
-  // Por ahora, las agregaremos al último grupo (Pink/Lifestyle) o al primero si está vacío?
-  // Mejor añadirlas al Blue que parece ser "General"
+  // Agregar huérfanas al grupo "General" (Blue)
   if (otherCategories.length > 0) {
-    groupedCategories[1].items.push(...otherCategories)
+    const blueGroup = groupedCategories.find(g => g.id === "blue")
+    if (blueGroup) {
+      blueGroup.items.push(...otherCategories)
+    }
   }
 
   return (

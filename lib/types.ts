@@ -3,6 +3,7 @@ export interface Category {
   name: string
   description: string | null
   image_url: string | null
+  block: "green" | "blue" | "cyan" | "pink" | null // [NEW]
   created_at: string
 }
 

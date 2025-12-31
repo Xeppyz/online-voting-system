@@ -1,32 +1,32 @@
 "use client"
 
-import { useEffect, Suspense } from "react"
+import { useEffect } from "react"
+import { createClient } from "@/lib/supabase/client"
 import { usePathname, useSearchParams } from "next/navigation"
-import { trackVisit } from "@/lib/analytics-actions"
 
-function AnalyticsTrackerContent() {
+export function AnalyticsTracker() {
     const pathname = usePathname()
     const searchParams = useSearchParams()
 
     useEffect(() => {
-        // Debounce or just track? 
-        // Just track for now. Logic handles rapid changes if needed?
-        // We'll track every path change.
+        const track = async () => {
+            const supabase = createClient()
 
-        // Construct full path
-        const url = `${pathname}${searchParams.toString() ? `?${searchParams.toString()}` : ""}`
+            // Intentamos obtener el usuario para métricas de "Usuarios Activos"
+            // No bloqueamos (no await crítico)
+            const { data: { user } } = await supabase.auth.getUser()
 
-        // Call server action
-        trackVisit(url)
+            // Usamos la tabla 'analytics_visits' que ya creamos para no tener que borrar/crear tablas nuevas
+            const { error } = await supabase.from('analytics_visits').insert({
+                path: pathname,
+                user_id: user?.id || null
+            })
+
+            if (error) console.error("Analytics Error:", error)
+        }
+
+        track()
     }, [pathname, searchParams])
 
     return null
-}
-
-export function AnalyticsTracker() {
-    return (
-        <Suspense fallback={null}>
-            <AnalyticsTrackerContent />
-        </Suspense>
-    )
 }

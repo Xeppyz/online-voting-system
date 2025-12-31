@@ -33,7 +33,7 @@ export function CategoriesManager({ categories, onCategoriesChange, preloadedIma
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [formData, setFormData] = useState({ name: "", description: "", image_url: "" })
+  const [formData, setFormData] = useState<{ name: string, description: string, image_url: string, block?: string }>({ name: "", description: "", image_url: "", block: "" })
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
   const [uploadProgress, setUploadProgress] = useState(false)
@@ -50,11 +50,12 @@ export function CategoriesManager({ categories, onCategoriesChange, preloadedIma
         name: category.name,
         description: category.description || "",
         image_url: category.image_url || "",
+        block: category.block || "", // [NEW]
       })
       setImagePreview(category.image_url || null)
     } else {
       setEditingCategory(null)
-      setFormData({ name: "", description: "", image_url: "" })
+      setFormData({ name: "", description: "", image_url: "", block: "" }) // [NEW]
       setImagePreview(null)
     }
     setIsDialogOpen(true)
@@ -133,6 +134,7 @@ export function CategoriesManager({ categories, onCategoriesChange, preloadedIma
             name: formData.name,
             description: formData.description || null,
             image_url: finalImageUrl || null,
+            block: formData.block || null,
           })
           .eq("id", editingCategory.id)
           .select()
@@ -148,6 +150,7 @@ export function CategoriesManager({ categories, onCategoriesChange, preloadedIma
             name: formData.name,
             description: formData.description || null,
             image_url: finalImageUrl || null,
+            block: formData.block || null,
           })
           .select()
           .single()
@@ -230,6 +233,22 @@ export function CategoriesManager({ categories, onCategoriesChange, preloadedIma
                   placeholder="Descripción de la categoría"
                   rows={3}
                 />
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="block">Bloque (Color)</Label>
+                <select
+                  id="block"
+                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  value={formData.block || ""}
+                  onChange={(e) => setFormData({ ...formData, block: e.target.value as any })}
+                >
+                  <option value="">Sin Bloque (Automático/Heredado)</option>
+                  <option value="green">Verde (Auténtico)</option>
+                  <option value="blue">Azul (Empresario)</option>
+                  <option value="cyan">Cyan (Travel)</option>
+                  <option value="pink">Rosa (Lifestyle)</option>
+                </select>
               </div>
 
               <div className="space-y-2">

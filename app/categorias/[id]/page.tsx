@@ -64,26 +64,10 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   // --- LOGICA DE TEMA DINÁMICO ---
   const groups = [
-    {
-      id: "green",
-      color: "#70e54e",
-      filter: ["Auténtico", "Orgullo Nica", "Producción", "Country", "Comediante"],
-    },
-    {
-      id: "blue",
-      color: "#4771ff",
-      filter: ["Empresario", "Educativo", "Podcast", "Familiar", "Fitness"],
-    },
-    {
-      id: "cyan",
-      color: "#3ffcff",
-      filter: ["Travel", "Revelación", "Polémico", "Foodie", "Duo", "Trend"],
-    },
-    {
-      id: "pink",
-      color: "#e87bff",
-      filter: ["Lifestyle", "Fashionista"],
-    },
+    { id: "green", color: "#70e54e", filter: ["Auténtico", "Orgullo Nica", "Producción", "Country", "Comediante"] },
+    { id: "blue", color: "#4771ff", filter: ["Empresario", "Educativo", "Podcast", "Familiar", "Fitness"] },
+    { id: "cyan", color: "#3ffcff", filter: ["Travel", "Revelación", "Polémico", "Foodie", "Duo", "Trend"] },
+    { id: "pink", color: "#e87bff", filter: ["Lifestyle", "Fashionista"] },
   ]
 
   const normalize = (str: string) =>
@@ -92,9 +76,14 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
 
-  const activeGroup = groups.find((g) =>
-    g.filter.some((keyword) => normalize(category.name).includes(normalize(keyword)))
-  )
+  // Priorizar el bloque asignado en DB, sino fallback a detección por nombre
+  let activeGroup = groups.find((g) => g.id === category.block)
+
+  if (!activeGroup) {
+    activeGroup = groups.find((g) =>
+      g.filter.some((keyword) => normalize(category.name).includes(normalize(keyword)))
+    )
+  }
 
   const themeColor = activeGroup ? activeGroup.color : "#4771ff" // Default Blue fallback
 

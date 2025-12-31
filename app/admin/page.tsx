@@ -25,20 +25,23 @@ export default async function AdminPage() {
   const { data: nominees } = await supabase.from("nominees").select("*, categories(name)").order("name")
   const { data: votes } = await supabase.from("votes").select("*")
 
-  // Get Analytics Data (Real)
-  const { data: visits } = await supabase.from("analytics_visits").select("*")
+  // Calculate Real Metrics from Votes
+  const uniqueVoters = new Set(votes?.map(v => v.user_id).filter(Boolean)).size
 
-  // Calculate unique engaged users (users who visited while logged in)
-  // Since we don't have a 'logins' table, we use distinct user_id from visits as a proxy for active users
-  // Or if we specifically want 'logins' we check visits to /dashboard or similar? 
-  // Let's simpler: Unique users in visits table = Active Users
-  const uniqueVisitors = new Set(visits?.map(v => v.user_id).filter(Boolean)).size
+  // Votes over time (Group by date) - REAL Data
+  // This replaces the empty "Visits" chart with a working "Votes" chart
+  const votesByDate = votes?.reduce((acc, vote) => {
+    const date = vote.created_at.split('T')[0] // YYYY-MM-DD
+    acc[date] = (acc[date] || 0) + 1
+    return acc
+  }, {} as Record<string, number>) || {}
 
-  // Total Visits
-  const totalVisits = visits?.length || 0
+  // Format for Recharts
+  const activityData = Object.entries(votesByDate)
+    .map(([date, count]) => ({ date, count }))
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .slice(-30) // Last 30 active days
 
-  // Organic vs Direct? We only have path. 
-  // We can just call it "Total Page Views" for now.
 
   // Get preloaded images
   const preloadedImages = await getPreloadedCategoryImages()
@@ -49,9 +52,8 @@ export default async function AdminPage() {
       initialNominees={nominees || []}
       totalVotes={votes?.length || 0}
       votes={votes || []}
-      totalVisits={totalVisits}
-      uniqueVisitors={uniqueVisitors}
-      visits={visits || []}
+      uniqueVoters={uniqueVoters}
+      activityData={activityData}
       preloadedImages={preloadedImages}
     />
   )

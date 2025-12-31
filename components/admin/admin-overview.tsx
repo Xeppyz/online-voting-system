@@ -23,9 +23,8 @@ interface AdminOverviewProps {
   nominees: Nominee[]
   totalVotes: number
   votes?: any[]
-  totalVisits: number
-  uniqueVisitors: number
-  visits?: any[]
+  uniqueVoters: number
+  activityData: { date: string, count: number }[]
 }
 
 export function AdminOverview({
@@ -33,9 +32,8 @@ export function AdminOverview({
   nominees,
   totalVotes,
   votes = [],
-  totalVisits,
-  uniqueVisitors,
-  visits = []
+  uniqueVoters,
+  activityData
 }: AdminOverviewProps) {
 
   // 1. Prepare Data for "Votes by Category" Bar Chart
@@ -45,26 +43,7 @@ export function AdminOverview({
       name: cat.name,
       votos: catVotes
     }
-  }).sort((a, b) => b.votos - a.votos) // Sort by popularity
-
-  // 2. Prepare Data for "Visits Over Time" Line Chart (Last 7 days)
-  const last7Days = eachDayOfInterval({
-    start: subDays(new Date(), 6),
-    end: new Date()
-  })
-
-  const visitsOverTime = last7Days.map(date => {
-    const dateStr = format(date, 'yyyy-MM-dd')
-    const dayVisits = visits.filter(v => v.created_at.startsWith(dateStr)).length
-    // Simulating "Organic" as a percentage for visual variety (since we don't have referrer data yet)
-    // In a real scenario, filter by referrer field.
-    // For now, let's just plot Total Visits to be 100% honest to "Real Data" request.
-
-    return {
-      date: format(date, 'd MMM', { locale: es }),
-      visitas: dayVisits
-    }
-  })
+  }).sort((a, b) => b.votos - a.votos)
 
   // Stats Cards Data
   const stats = [
@@ -74,31 +53,31 @@ export function AdminOverview({
       value: totalVotes.toLocaleString(),
       color: "text-primary",
       bgColor: "bg-primary/10",
-      change: "+12.5% vs mes ant.", // Placeholder for trend
+      change: "Global",
     },
     {
-      icon: Eye,
-      label: "Vistas Totales", // New
-      value: totalVisits.toLocaleString(),
-      color: "text-blue-500",
-      bgColor: "bg-blue-500/10",
-      change: "Tiempo Real",
-    },
-    {
-      icon: UserCheck, // New
-      label: "Usuarios Activos", // Logged in users proxy
-      value: uniqueVisitors.toLocaleString(),
+      icon: Users,
+      label: "Usuarios (Votantes)",
+      value: uniqueVoters.toLocaleString(),
       color: "text-green-500",
       bgColor: "bg-green-500/10",
-      change: "Iniciaron Sesión",
+      change: "Únicos",
+    },
+    {
+      icon: LayoutGrid,
+      label: "Categorías",
+      value: categories.length.toString(),
+      color: "text-[#00D4FF]",
+      bgColor: "bg-[#00D4FF]/10",
+      change: "Activas",
     },
     {
       icon: TrendingUp,
-      label: "Prom. Votos/Cat",
-      value: categories.length > 0 ? Math.round(totalVotes / categories.length).toString() : "0",
+      label: "Votos por Usuario",
+      value: uniqueVoters > 0 ? (totalVotes / uniqueVoters).toFixed(1) : "0",
       color: "text-amber-500",
       bgColor: "bg-amber-500/10",
-      change: "Estable",
+      change: "Promedio",
     },
   ]
 
@@ -131,16 +110,16 @@ export function AdminOverview({
       {/* Main Charts Area */}
       <div className="grid grid-cols-1 lg:grid-cols-7 gap-6">
 
-        {/* Left: Visits Timeline (Line Chart) */}
+        {/* Left: Votes Activity (Line Chart) */}
         <Card className="lg:col-span-4 border-border/50">
           <CardHeader>
-            <CardTitle>Tráfico Web (Últimos 7 días)</CardTitle>
-            <CardDescription>Visitas totales registradas en la plataforma</CardDescription>
+            <CardTitle>Actividad de Votación</CardTitle>
+            <CardDescription>Votos registrados en los últimos 30 días</CardDescription>
           </CardHeader>
           <CardContent className="pl-0">
             <div className="h-[300px] w-full">
               <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={visitsOverTime}>
+                <LineChart data={activityData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#333" opacity={0.2} />
                   <XAxis
                     dataKey="date"
@@ -162,10 +141,10 @@ export function AdminOverview({
                   />
                   <Line
                     type="monotone"
-                    dataKey="visitas"
-                    stroke="#00D4FF"
+                    dataKey="count"
+                    stroke="#70e54e"
                     strokeWidth={3}
-                    dot={{ fill: '#00D4FF', r: 4 }}
+                    dot={{ fill: '#70e54e', r: 4 }}
                     activeDot={{ r: 6 }}
                   />
                 </LineChart>

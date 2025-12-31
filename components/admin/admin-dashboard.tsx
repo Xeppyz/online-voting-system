@@ -17,10 +17,9 @@ interface AdminDashboardProps {
   initialCategories: Category[]
   initialNominees: NomineeWithCategory[]
   totalVotes: number
-  votes?: any[] // Todo: Type this properly
-  totalVisits: number
-  uniqueVisitors: number
-  visits?: any[]
+  votes?: any[]
+  uniqueVoters: number
+  activityData: { date: string, count: number }[]
   preloadedImages: string[]
 }
 
@@ -29,9 +28,8 @@ export function AdminDashboard({
   initialNominees,
   totalVotes,
   votes = [],
-  totalVisits,
-  uniqueVisitors,
-  visits = [],
+  uniqueVoters,
+  activityData,
   preloadedImages
 }: AdminDashboardProps) {
   const [categories, setCategories] = useState(initialCategories)
@@ -69,9 +67,8 @@ export function AdminDashboard({
               nominees={nominees}
               totalVotes={totalVotes}
               votes={votes}
-              totalVisits={totalVisits}
-              uniqueVisitors={uniqueVisitors}
-              visits={visits}
+              uniqueVoters={uniqueVoters}
+              activityData={activityData}
             />
           </TabsContent>
 
