@@ -164,18 +164,6 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
               <p className="text-lg text-muted-foreground leading-relaxed">{nominee.description}</p>
             )}
 
-            {/* Stats Card */}
-            <div className="p-6 rounded-2xl bg-card border border-border">
-              <h3 className="text-sm font-medium text-muted-foreground mb-4">Estadísticas de votación</h3>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-2xl font-bold text-foreground">{nominee.vote_count} votos</span>
-                  <span className="text-3xl font-bold text-primary">{nominee.percentage}%</span>
-                </div>
-                <Progress value={nominee.percentage} className="h-3" />
-              </div>
-            </div>
-
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
               <Button

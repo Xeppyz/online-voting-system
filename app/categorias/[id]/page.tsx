@@ -128,12 +128,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                 </p>
               )}
 
-              <div className="mt-8 flex items-center gap-4">
-                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10">
-                  <span className="text-2xl font-bold text-white">{totalVotes}</span>
-                  <span className="text-sm text-white/50 uppercase font-medium">Votos Totales</span>
-                </div>
-              </div>
+
             </div>
           </div>
         </div>

@@ -145,14 +145,7 @@ export function NomineeCard({
                 </p>
               )}
 
-              {/* Vote Stats */}
-              <div className="space-y-2 mb-6">
-                <div className="flex items-center justify-between text-sm px-2">
-                  <span className="text-muted-foreground">{nominee.vote_count} votos</span>
-                  <span className="font-medium text-primary">{nominee.percentage}%</span>
-                </div>
-                <Progress value={nominee.percentage} className="h-2" />
-              </div>
+
             </div>
 
             <div className="space-y-3 w-full">
