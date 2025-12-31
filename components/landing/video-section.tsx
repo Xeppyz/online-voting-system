@@ -18,7 +18,7 @@ export function VideoSection() {
                         Vive la <span className="text-primary">Experiencia</span>
                     </h2>
                     <p className="text-gray-400 text-center max-w-[600px] mx-auto text-lg">
-                        Revive los mejores momentos de la edición anterior y prepárate para lo que viene.
+                        El reconocimiento más ambicioso de la región.
                     </p>
                 </div>
 
