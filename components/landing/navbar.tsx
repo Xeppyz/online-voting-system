@@ -41,19 +41,13 @@ export function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-[#00D4FF] flex items-center justify-center">
-              <Vote className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="font-bold text-lg text-foreground hidden sm:block">Clikawards</span>
+            <img src="/icon/ClikHFull.png" alt="Clikawards" className="h-10 w-auto object-contain" />
           </Link>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-6">
-            <Link href="/categorias" className="text-muted-foreground hover:text-foreground transition-colors">
+            <Link href="/categorias" className="text-sm font-medium hover:text-primary transition-colors">
               Categorías
-            </Link>
-            <Link href="/estadisticas" className="text-muted-foreground hover:text-foreground transition-colors">
-              Estadísticas
             </Link>
             {isAdmin && (
               <Link href="/admin" className="text-muted-foreground hover:text-foreground transition-colors">
@@ -91,17 +85,10 @@ export function Navbar() {
           <div className="px-4 py-4 space-y-3">
             <Link
               href="/categorias"
-              className="block text-muted-foreground hover:text-foreground transition-colors py-2"
+              className="block px-3 py-2 text-base font-medium hover:bg-muted rounded-md transition-colors"
               onClick={() => setIsOpen(false)}
             >
               Categorías
-            </Link>
-            <Link
-              href="/estadisticas"
-              className="block text-muted-foreground hover:text-foreground transition-colors py-2"
-              onClick={() => setIsOpen(false)}
-            >
-              Estadísticas
             </Link>
             {isAdmin && (
               <Link

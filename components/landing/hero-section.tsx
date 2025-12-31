@@ -21,94 +21,66 @@ export async function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
       {/* Background Elements */}
-      <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-[#00D4FF]/5" />
+      {/* Background Elements - Removed to allow page background to show */}
+      {/* <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-[#00D4FF]/5" /> */}
 
-      {/* Animated Orbs */}
-      {/* Removed animated orbs */}
-      {/* <div className="absolute top-20 left-10 w-72 h-72 bg-primary/20 rounded-full blur-3xl animate-float" />
-      <div
-        className="absolute bottom-20 right-10 w-96 h-96 bg-[#00D4FF]/20 rounded-full blur-3xl animate-float"
-        style={{ animationDelay: "2s" }}
-      />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-gradient-to-r from-primary/10 to-[#00D4FF]/10 rounded-full blur-3xl" /> */}
-
-      {/* Grid Pattern */}
-      {/* Simplified background */}
-      <div
-        className="absolute inset-0 opacity-[0.02]"
-        style={{
-          backgroundImage:
-            "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fillRule='evenodd'%3E%3Cg fill='%230066FF' fillOpacity='1'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E\")",
-        }}
-      />
+      {/* Grid Pattern - Removed */}
+      {/* <div className="absolute inset-0 opacity-[0.02]" ... /> */}
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        {/* Removed motion effects */}
         <div className="space-y-8">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary">
-            {/* Removed Sparkles icon */}
-            <span className="text-sm font-medium">Votaciones Abiertas 2026</span>
+            <span className="text-sm font-medium uppercase tracking-wide">Primer Edición de los Clikaward Enero 2026 - Managua - Nicaragua</span>
           </div>
 
-          {/* Main Title */}
-          <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-balance">
-            <span className="text-foreground">Clik</span>
-            <br />
-            <span className="bg-gradient-to-r from-primary via-[#3385FF] to-[#00D4FF] bg-clip-text text-transparent">
-              awards
-            </span>
-          </h1>
-
-          {/* Subtitle */}
-          <p className="text-xl sm:text-2xl text-muted-foreground max-w-2xl mx-auto text-pretty">
-            Tu voto cuenta. Elige a tus favoritos y sé parte de la celebración más grande del año.
-          </p>
-
-          {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link href="/categorias">
-              <Button
-                size="lg"
-                className="text-lg px-8 py-6 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all"
-              >
-                <Vote className="w-5 h-5 mr-2" />
-                Iniciar Votación
-              </Button>
-            </Link>
-            {/* Updated link to "/estadisticas" */}
-            <Link href="/estadisticas">
-              <Button size="lg" variant="outline" className="text-lg px-8 py-6 rounded-xl bg-transparent">
-                Ver Estadísticas
-              </Button>
-            </Link>
-          </div>
-
-          {/* Stats */}
-          <div className="pt-12 grid grid-cols-3 gap-8 max-w-lg mx-auto">
-            <div className="text-center">
-              <div className="flex items-center justify-center w-12 h-12 mx-auto mb-2 rounded-xl bg-primary/10">
-                <Trophy className="w-6 h-6 text-primary" />
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center mt-8">
+            {/* Left Image Block */}
+            <div className="block md:col-span-3 order-1 md:order-1">
+              <div className="relative w-full aspect-[3/4] max-w-[200px] md:max-w-full mx-auto rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 transform rotate-[-6deg] hover:rotate-0 transition-transform duration-500">
+                <img src="/side/side1.png" alt="Clikawards Highlights" className="object-cover w-full h-full" />
               </div>
-              {/* Updated with real data */}
-              <div className="text-2xl font-bold text-foreground">{categoriesCount}</div>
-              <div className="text-sm text-muted-foreground">Categorías</div>
             </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center w-12 h-12 mx-auto mb-2 rounded-xl bg-primary/10">
-                <Users className="w-6 h-6 text-primary" />
+
+            {/* Main Content */}
+            <div className="col-span-1 md:col-span-6 space-y-8 order-2 md:order-2">
+              {/* Main Title */}
+              <h1 className="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight text-balance">
+                <span className="text-foreground">Clik</span>
+                <br />
+                <span className="text-foreground">
+                  awards
+                </span>
+              </h1>
+
+              {/* Subtitle */}
+              <p className="text-xl sm:text-2xl text-muted-foreground max-w-2xl mx-auto text-pretty">
+                Tu voto cuenta. Elige a tus favoritos y sé parte de la celebración más grande del año.
+              </p>
+
+              {/* CTA Buttons */}
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                <Link href="/categorias">
+                  <Button
+                    size="lg"
+                    className="text-lg px-8 py-6 rounded-xl shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 transition-all bg-[var(--brand-blue)] hover:bg-[var(--brand-blue)]/90"
+                  >
+                    <Vote className="w-5 h-5 mr-2" />
+                    Iniciar Votación
+                  </Button>
+                </Link>
+                {/* Stats button hidden/removed for user as requested, or keep strictly? 
+                    User said: "quitaremos las estadistica de la vista del usuario normal, soolo estara para el admin tambien quitaremos el contador de votos"
+                    So I will remove the "Ver Estadísticas" button as well to clean up the user view.
+                */}
               </div>
-              {/* Updated with real data */}
-              <div className="text-2xl font-bold text-foreground">{nomineesCount}</div>
-              <div className="text-sm text-muted-foreground">Nominados</div>
             </div>
-            <div className="text-center">
-              <div className="flex items-center justify-center w-12 h-12 mx-auto mb-2 rounded-xl bg-primary/10">
-                <Vote className="w-6 h-6 text-primary" />
+
+            {/* Right Image Block */}
+            <div className="block md:col-span-3 order-3 md:order-3">
+              <div className="relative w-full aspect-[3/4] max-w-[200px] md:max-w-full mx-auto rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 transform rotate-[6deg] hover:rotate-0 transition-transform duration-500">
+                <img src="/side/side1.1.png" alt="Clikawards Highlights" className="object-cover w-full h-full" />
               </div>
-              {/* Updated with real data */}
-              <div className="text-2xl font-bold text-foreground">{votesCount}</div>
-              <div className="text-sm text-muted-foreground">Votos</div>
             </div>
           </div>
         </div>

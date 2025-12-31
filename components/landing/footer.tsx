@@ -6,11 +6,15 @@ export function Footer() {
     <footer className="py-12 border-t border-border bg-muted/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
-          <div className="flex items-center gap-2">
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-[#00D4FF] flex items-center justify-center">
-              <Vote className="w-5 h-5 text-primary-foreground" />
+          <div className="flex flex-col gap-4">
+            <Link href="/" className="flex items-center gap-2">
+              <img src="/icon/ClikHFull.png" alt="Clikawards" className="h-8 w-auto object-contain" />
+            </Link>
+            <div className="flex items-center gap-4 mt-2">
+              <img src="/icon/LOGOPERFILRSS.png" alt="RSS" className="h-8 w-auto opacity-80 hover:opacity-100 transition-opacity" />
+              <img src="/icon/LOGOPERFILRSS02.png" alt="RSS 02" className="h-8 w-auto opacity-80 hover:opacity-100 transition-opacity" />
             </div>
-            <span className="font-bold text-lg text-foreground">Clikawards</span>
+            <p className="text-sm text-muted-foreground mt-2">Contacto email: clikawardsni@gmail.com</p>
           </div>
 
           <div className="flex items-center gap-6 text-sm text-muted-foreground">

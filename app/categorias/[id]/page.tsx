@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 import { NomineesGrid } from "@/components/nominees/nominees-grid"
 import { Navbar } from "@/components/landing/navbar"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft } from "lucide-react"
+import { ArrowLeft, Trophy } from "lucide-react"
 import Link from "next/link"
 
 interface CategoryPageProps {
@@ -62,30 +62,102 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
     userVote = vote?.nominee_id || null
   }
 
+  // --- LOGICA DE TEMA DINÁMICO ---
+  const groups = [
+    {
+      id: "green",
+      color: "#70e54e",
+      filter: ["Auténtico", "Orgullo Nica", "Producción", "Country", "Comediante"],
+    },
+    {
+      id: "blue",
+      color: "#4771ff",
+      filter: ["Empresario", "Educativo", "Podcast", "Familiar", "Fitness"],
+    },
+    {
+      id: "cyan",
+      color: "#3ffcff",
+      filter: ["Travel", "Revelación", "Polémico", "Foodie", "Duo", "Trend"],
+    },
+    {
+      id: "pink",
+      color: "#e87bff",
+      filter: ["Lifestyle", "Fashionista"],
+    },
+  ]
+
+  const normalize = (str: string) =>
+    str
+      .toLowerCase()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+
+  const activeGroup = groups.find((g) =>
+    g.filter.some((keyword) => normalize(category.name).includes(normalize(keyword)))
+  )
+
+  const themeColor = activeGroup ? activeGroup.color : "#4771ff" // Default Blue fallback
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-black text-white selection:bg-white/20">
       <Navbar />
-      <main className="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
-        <div className="mb-8">
-          <Link href="/categorias">
-            <Button variant="ghost" className="mb-4">
-              <ArrowLeft className="w-4 h-4 mr-2" />
-              Volver a Categorías
-            </Button>
+
+      {/* Header con Color Dinámico */}
+      <main className="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-[1920px] mx-auto">
+        <div className="mb-12">
+          <Link href="/categorias" className="inline-block mb-8 group">
+            <div className="flex items-center gap-2 text-white/50 group-hover:text-white transition-colors">
+              <div className="p-2 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors">
+                <ArrowLeft className="w-5 h-5" />
+              </div>
+              <span className="font-medium text-sm uppercase tracking-wider">Volver a Categorías</span>
+            </div>
           </Link>
 
-          <div className="text-center">
-            <h1 className="text-4xl sm:text-5xl font-bold text-foreground mb-4 text-balance">{category.name}</h1>
-            {category.description && (
-              <p className="text-lg text-muted-foreground max-w-2xl mx-auto text-pretty">{category.description}</p>
-            )}
-            <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-medium">
-              {totalVotes} votos totales
+          <div className="relative">
+            {/* Elemento decorativo de fondo */}
+            <div
+              className="absolute -top-20 -left-20 w-64 h-64 blur-[100px] opacity-20 pointer-events-none mix-blend-screen"
+              style={{ backgroundColor: themeColor }}
+            />
+
+            <div className="relative z-10">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-4">
+                <Trophy className="w-4 h-4" style={{ color: themeColor }} />
+                <span className="text-xs font-bold uppercase tracking-wider" style={{ color: themeColor }}>
+                  Clikawards 2026
+                </span>
+              </div>
+
+              <h1 className="text-5xl sm:text-7xl font-black mb-6 text-white uppercase tracking-tighter leading-none text-balance">
+                Clik <span style={{ color: themeColor }}>{category.name}</span>
+              </h1>
+
+              {category.description && (
+                <p className="text-xl text-white/60 max-w-2xl text-pretty border-l-2 pl-6" style={{ borderColor: themeColor }}>
+                  {category.description}
+                </p>
+              )}
+
+              <div className="mt-8 flex items-center gap-4">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-lg bg-white/5 border border-white/10">
+                  <span className="text-2xl font-bold text-white">{totalVotes}</span>
+                  <span className="text-sm text-white/50 uppercase font-medium">Votos Totales</span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
-        <NomineesGrid nominees={nomineesWithVotes} categoryId={id} userVote={userVote} userId={user?.id} />
+        {/* Separador */}
+        <div className="w-full h-px bg-gradient-to-r from-transparent via-white/10 to-transparent mb-12" />
+
+        <NomineesGrid
+          nominees={nomineesWithVotes}
+          categoryId={id}
+          userVote={userVote}
+          userId={user?.id}
+        />
       </main>
     </div>
   )

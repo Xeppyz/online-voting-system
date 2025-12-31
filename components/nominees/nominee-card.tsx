@@ -3,7 +3,7 @@
 import type { NomineeWithVotes } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { Vote, Check, User, Play } from "lucide-react"
+import { Vote, Check, User } from "lucide-react"
 import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
@@ -19,16 +19,27 @@ interface NomineeCardProps {
   hasVoted: boolean
   userId?: string
   categoryName?: string
+  showCategoryInfo?: boolean
+  compact?: boolean
 }
 
-export function NomineeCard({ nominee, categoryId, isVoted, hasVoted, userId, categoryName }: NomineeCardProps) {
+export function NomineeCard({
+  nominee,
+  categoryId,
+  isVoted,
+  hasVoted,
+  userId,
+  categoryName,
+  showCategoryInfo = true,
+  compact = false
+}: NomineeCardProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [showLoginDialog, setShowLoginDialog] = useState(false)
   const [localIsVoted, setLocalIsVoted] = useState(isVoted)
   const router = useRouter()
 
   const handleVote = async (e: React.MouseEvent) => {
-    e.preventDefault() // Prevent link navigation if inside a link
+    e.preventDefault()
     e.stopPropagation()
 
     if (!userId) {
@@ -53,7 +64,6 @@ export function NomineeCard({ nominee, categoryId, isVoted, hasVoted, userId, ca
 
       setLocalIsVoted(true)
 
-      // Trigger confetti
       confetti({
         particleCount: 100,
         spread: 70,
@@ -73,7 +83,8 @@ export function NomineeCard({ nominee, categoryId, isVoted, hasVoted, userId, ca
 
   return (
     <>
-      <div className="group h-[400px] w-full [perspective:1000px]">
+      {/* CORRECCIÓN: Usamos h-auto en lugar de h-full para que el aspect-ratio mande sobre la altura */}
+      <div className={`group h-auto w-full aspect-[4/5] [perspective:1000px] ${compact ? 'text-sm' : ''}`}>
         <div className="relative h-full w-full transition-all duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
           {/* Front Face */}
           <div className="absolute inset-0 h-full w-full rounded-2xl overflow-hidden [backface-visibility:hidden]">
@@ -87,17 +98,18 @@ export function NomineeCard({ nominee, categoryId, isVoted, hasVoted, userId, ca
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <div className="w-24 h-24 rounded-full bg-primary/20 flex items-center justify-center">
-                    <User className="w-12 h-12 text-primary" />
+                  <div className={`rounded-full bg-primary/20 flex items-center justify-center ${compact ? 'w-16 h-16' : 'w-24 h-24'}`}>
+                    <User className={`${compact ? 'w-8 h-8' : 'w-12 h-12'} text-primary`} />
                   </div>
                 </div>
               )}
               {/* Gradient Overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
 
-              {/* Name on Front (Optional, but good for UX) */}
+              {/* Name on Front */}
               <div className="absolute bottom-4 left-4 right-4 text-white">
-                <h3 className="text-xl font-bold truncate">{nominee.name}</h3>
+                {/* Usamos line-clamp-2 para evitar textos muy largos */}
+                <h3 className={`${compact ? 'text-lg' : 'text-xl'} font-bold line-clamp-2 leading-tight`}>{nominee.name}</h3>
               </div>
 
               {/* Voted Badge */}
@@ -112,17 +124,25 @@ export function NomineeCard({ nominee, categoryId, isVoted, hasVoted, userId, ca
 
           {/* Back Face */}
           <div className="absolute inset-0 h-full w-full rounded-2xl bg-card border border-border p-6 [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-center items-center text-center">
-            {/* Floating Category Badge */}
-            {categoryName && (
+            {categoryName && showCategoryInfo && (
               <div className="absolute top-6 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-primary to-[#00D4FF] text-white text-xs font-bold shadow-lg transform hover:scale-105 transition-transform z-20">
                 {categoryName}
               </div>
             )}
 
             <div className="w-full mt-6">
-              <h3 className="text-xl font-bold text-foreground mb-2">{nominee.name}</h3>
+              <h3 className="text-xl font-bold text-foreground mb-1 truncate">{nominee.name}</h3>
               {nominee.description && (
-                <p className="text-muted-foreground text-sm line-clamp-3 mb-4">{nominee.description}</p>
+                <p
+                  className="text-muted-foreground text-sm mb-4 overflow-hidden"
+                  style={{
+                    display: "-webkit-box",
+                    WebkitLineClamp: 3, // Ajustado a 3 líneas para que se vea bien
+                    WebkitBoxOrient: "vertical",
+                  }}
+                >
+                  {nominee.description}
+                </p>
               )}
 
               {/* Vote Stats */}
@@ -138,7 +158,7 @@ export function NomineeCard({ nominee, categoryId, isVoted, hasVoted, userId, ca
             <div className="space-y-3 w-full">
               <Link href={`/nominados/${nominee.id}`} className="block w-full">
                 <Button variant="outline" className="w-full">
-                  Ver Perfil Completo
+                  Ver Perfil
                 </Button>
               </Link>
 
@@ -149,7 +169,7 @@ export function NomineeCard({ nominee, categoryId, isVoted, hasVoted, userId, ca
                 variant={voted ? "outline" : "default"}
               >
                 {isLoading ? (
-                  "Votando..."
+                  "..."
                 ) : voted ? (
                   <>
                     <Check className="w-4 h-4 mr-2" />

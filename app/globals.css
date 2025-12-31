@@ -11,8 +11,10 @@
   --card-foreground: oklch(0.15 0.02 250);
   --popover: oklch(1 0 0);
   --popover-foreground: oklch(0.15 0.02 250);
-  --primary: #3cabaa;
-  --primary-foreground: oklch(1 0 0);
+
+  --primary: #4771ff;
+  --primary-foreground: #ffffff;
+  --secondary: oklch(0.95 0.02 250);
   --secondary: oklch(0.95 0.02 250);
   --secondary-foreground: oklch(0.2 0.02 250);
   --muted: oklch(0.95 0.01 250);
@@ -23,7 +25,9 @@
   --destructive-foreground: oklch(1 0 0);
   --border: oklch(0.9 0.01 250);
   --input: oklch(0.9 0.01 250);
-  --ring: #3cabaa;
+  --input: oklch(0.9 0.01 250);
+  --ring: #4771ff;
+  --chart-1: oklch(0.55 0.22 255);
   --chart-1: oklch(0.55 0.22 255);
   --chart-2: oklch(0.7 0.15 200);
   --chart-3: oklch(0.6 0.2 280);
@@ -37,18 +41,26 @@
   --sidebar-accent: oklch(0.92 0.03 250);
   --sidebar-accent-foreground: oklch(0.2 0.02 250);
   --sidebar-border: oklch(0.9 0.01 250);
-  --sidebar-ring: #3cabaa;
+  --sidebar-border: oklch(0.9 0.01 250);
+  --sidebar-ring: #4771ff;
+
+  /* Brand Colors */
+  --brand-green: #70e54e;
+  --brand-cyan: #3ffcff;
+  --brand-blue: #4771ff;
+  --brand-pink: #e87bff;
+  --brand-black: #0a0a0a;
 }
 
 .dark {
-  --background: oklch(0.12 0.02 250);
+  --background: #0a0a0a;
   --foreground: #ffffff;
   --card: oklch(0.15 0.02 250);
   --card-foreground: #ffffff;
   --popover: oklch(0.15 0.02 250);
   --popover-foreground: #ffffff;
-  --primary: #3cabaa;
-  --primary-foreground: oklch(1 0 0);
+  --primary: #4771ff;
+  --primary-foreground: #ffffff;
   --secondary: oklch(0.2 0.02 250);
   --secondary-foreground: #ffffff;
   --muted: oklch(0.2 0.02 250);
@@ -59,7 +71,7 @@
   --destructive-foreground: #ffffff;
   --border: oklch(0.25 0.02 250);
   --input: oklch(0.25 0.02 250);
-  --ring: #3cabaa;
+  --ring: #4771ff;
   --chart-1: oklch(0.6 0.22 255);
   --chart-2: oklch(0.65 0.15 200);
   --chart-3: oklch(0.55 0.2 280);
@@ -72,11 +84,11 @@
   --sidebar-accent: oklch(0.22 0.03 250);
   --sidebar-accent-foreground: #ffffff;
   --sidebar-border: oklch(0.25 0.02 250);
-  --sidebar-ring: #3cabaa;
+  --sidebar-ring: #4771ff;
 }
 
 @theme inline {
-  --font-sans: "Inter", "Inter Fallback", system-ui, sans-serif;
+  --font-sans: var(--font-sentient), "Inter", "Inter Fallback", system-ui, sans-serif;
   --font-mono: "Geist Mono", "Geist Mono Fallback", monospace;
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -114,12 +126,20 @@
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-ring: var(--sidebar-ring);
+
+  /* Brand Colors in Theme */
+  --color-brand-green: var(--brand-green);
+  --color-brand-cyan: var(--brand-cyan);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-pink: var(--brand-pink);
+  --color-brand-black: var(--brand-black);
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
@@ -127,21 +147,25 @@
 
 /* Custom animations for the voting system */
 @keyframes float {
+
   0%,
   100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-20px);
   }
 }
 
 @keyframes gradient {
+
   0%,
   100% {
     background-size: 200% 200%;
     background-position: left center;
   }
+
   50% {
     background-size: 200% 200%;
     background-position: right center;
@@ -154,4 +178,47 @@
 
 .animate-gradient {
   animation: gradient 3s ease infinite;
+}
+
+/* Background Utilities */
+.bg-clik-sq {
+  background-image: url('/background/BGCLIK1X1.png');
+  background-size: cover;
+  background-position: center;
+}
+
+.bg-clik-4x5 {
+  background-image: url('/background/BGCLIK4X5.png');
+  background-size: cover;
+  background-position: center;
+}
+
+.bg-clik-9x16 {
+  background-image: url('/background/BGCLIK9X16.png');
+  background-size: cover;
+  background-position: center;
+}
+
+.bg-clik-16x9 {
+  background-image: url('/background/BGCLIK16X9.png');
+  background-size: cover;
+  background-position: center;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  animation: marquee 40s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
 }

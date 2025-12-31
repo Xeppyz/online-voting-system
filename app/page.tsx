@@ -7,6 +7,8 @@ import { Navbar } from "@/components/landing/navbar"
 import { TopNomineesSection } from "@/components/landing/top-nominees-section"
 import { VideoSection } from "@/components/landing/video-section"
 import { ScrollAnimation } from "@/components/ui/scroll-animation"
+import { SideSection } from "@/components/landing/side-section"
+import { SponsorsSection } from "@/components/landing/sponsors-section"
 
 export default async function HomePage() {
   const supabase = await createClient()
@@ -27,7 +29,7 @@ export default async function HomePage() {
   // Fetch all nominees with their categories
   const { data: allNominees } = await supabase
     .from("nominees")
-    .select("*, categories(name, description)")
+    .select("*, categories(name, description, image_url)")
 
   // Calculate stats for all nominees
   let nomineesWithData: any[] = []
@@ -44,6 +46,7 @@ export default async function HomePage() {
         percentage: totalCategoryVotes > 0 ? Math.round((nomineeVotes / totalCategoryVotes) * 100) : 0,
         category_name: nominee.categories?.name || "Categoría",
         category_description: nominee.categories?.description || "",
+        category_image: nominee.categories?.image_url || null,
       }
     })
   }
@@ -67,7 +70,7 @@ export default async function HomePage() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background bg-clik-16x9 bg-cover bg-center bg-fixed">
       <Navbar />
       <main>
         <ScrollAnimation>
@@ -77,6 +80,8 @@ export default async function HomePage() {
         <ScrollAnimation>
           <TopNomineesSection nominees={nomineesWithData} userVotes={userVotes} userId={user?.id} />
         </ScrollAnimation>
+
+        <SideSection />
 
         <ScrollAnimation>
           <VideoSection />
@@ -89,6 +94,8 @@ export default async function HomePage() {
         <ScrollAnimation>
           <HowItWorksSection />
         </ScrollAnimation>
+
+        <SponsorsSection />
       </main>
       <Footer />
     </div>

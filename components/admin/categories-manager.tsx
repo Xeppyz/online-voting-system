@@ -17,6 +17,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Plus, Pencil, Trash2, LayoutGrid, X, ImageIcon } from "lucide-react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
@@ -25,9 +26,10 @@ import Image from "next/image"
 interface CategoriesManagerProps {
   categories: Category[]
   onCategoriesChange: (categories: Category[]) => void
+  preloadedImages: string[]
 }
 
-export function CategoriesManager({ categories, onCategoriesChange }: CategoriesManagerProps) {
+export function CategoriesManager({ categories, onCategoriesChange, preloadedImages }: CategoriesManagerProps) {
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [isLoading, setIsLoading] = useState(false)
@@ -232,38 +234,74 @@ export function CategoriesManager({ categories, onCategoriesChange }: Categories
 
               <div className="space-y-2">
                 <Label>Imagen</Label>
-                <input
-                  ref={fileInputRef}
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageSelect}
-                  className="hidden"
-                />
 
-                {imagePreview ? (
-                  <div className="relative w-full h-40 rounded-lg overflow-hidden border border-border">
-                    <Image src={imagePreview || "/placeholder.svg"} alt="Preview" fill className="object-cover" />
-                    <button
-                      type="button"
-                      onClick={handleRemoveImage}
-                      className="absolute top-2 right-2 p-1 rounded-full bg-background/80 hover:bg-background text-foreground"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                ) : (
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="w-full h-40 rounded-lg border-2 border-dashed border-border hover:border-primary/50 flex flex-col items-center justify-center gap-2 transition-colors"
-                  >
-                    <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
-                      <ImageIcon className="w-6 h-6 text-muted-foreground" />
+                <Tabs defaultValue="upload" className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="upload">Subir Archivo</TabsTrigger>
+                    <TabsTrigger value="select">Seleccionar Galería</TabsTrigger>
+                  </TabsList>
+
+                  <TabsContent value="upload" className="space-y-4 mt-4">
+                    <input
+                      ref={fileInputRef}
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageSelect}
+                      className="hidden"
+                    />
+
+                    {imagePreview && imageFile ? (
+                      <div className="relative w-full h-40 rounded-lg overflow-hidden border border-border">
+                        <Image src={imagePreview || "/placeholder.svg"} alt="Preview" fill className="object-cover" />
+                        <button
+                          type="button"
+                          onClick={handleRemoveImage}
+                          className="absolute top-2 right-2 p-1 rounded-full bg-background/80 hover:bg-background text-foreground"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        className="w-full h-40 rounded-lg border-2 border-dashed border-border hover:border-primary/50 flex flex-col items-center justify-center gap-2 transition-colors"
+                      >
+                        <div className="w-12 h-12 rounded-full bg-muted flex items-center justify-center">
+                          <ImageIcon className="w-6 h-6 text-muted-foreground" />
+                        </div>
+                        <span className="text-sm text-muted-foreground">Haz clic para subir una imagen</span>
+                        <span className="text-xs text-muted-foreground">PNG, JPG hasta 5MB</span>
+                      </button>
+                    )}
+                  </TabsContent>
+
+                  <TabsContent value="select" className="mt-4">
+                    <div className="grid grid-cols-3 gap-2 max-h-60 overflow-y-auto p-1">
+                      {preloadedImages.map((img, index) => (
+                        <button
+                          key={index}
+                          type="button"
+                          onClick={() => {
+                            setFormData({ ...formData, image_url: img })
+                            setImagePreview(img)
+                            setImageFile(null)
+                          }}
+                          className={`relative aspect-square rounded-md overflow-hidden border-2 transition-all ${formData.image_url === img ? "border-primary ring-2 ring-primary/30" : "border-transparent hover:border-primary/50"
+                            }`}
+                        >
+                          <Image src={img} alt={`Gallery ${index}`} fill className="object-cover" />
+                        </button>
+                      ))}
                     </div>
-                    <span className="text-sm text-muted-foreground">Haz clic para subir una imagen</span>
-                    <span className="text-xs text-muted-foreground">PNG, JPG hasta 5MB</span>
-                  </button>
-                )}
+                    {/* Show selected preview if it's a preloaded image (not a file upload) */}
+                    {!imageFile && formData.image_url && (
+                      <div className="mt-2 text-xs text-muted-foreground truncate">
+                        Seleccionada: {formData.image_url.split('/').pop()}
+                      </div>
+                    )}
+                  </TabsContent>
+                </Tabs>
               </div>
 
               <Button onClick={handleSave} disabled={isLoading || uploadProgress} className="w-full">
