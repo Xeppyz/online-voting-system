@@ -20,8 +20,7 @@ const sentient = localFont({
       style: "italic",
     },
   ],
-  
-
+  variable: "--font-sentient",
 })
 
 export const metadata: Metadata = {
