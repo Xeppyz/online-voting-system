@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, Suspense } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { usePathname, useSearchParams } from "next/navigation"
 
-export function AnalyticsTracker() {
+function AnalyticsTrackerContent() {
     const pathname = usePathname()
     const searchParams = useSearchParams()
 
@@ -29,4 +29,12 @@ export function AnalyticsTracker() {
     }, [pathname, searchParams])
 
     return null
+}
+
+export function AnalyticsTracker() {
+    return (
+        <Suspense fallback={null}>
+            <AnalyticsTrackerContent />
+        </Suspense>
+    )
 }
