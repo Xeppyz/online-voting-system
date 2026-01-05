@@ -141,6 +141,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           categoryId={id}
           userVote={userVote}
           userId={user?.id}
+          themeColor={themeColor}
         />
       </main>
     </div>

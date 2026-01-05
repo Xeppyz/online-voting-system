@@ -211,7 +211,8 @@ export function CategoriesManager({ categories, onCategoriesChange, preloadedIma
               </DialogDescription>
             </DialogHeader>
 
-            <div className="space-y-4">
+            {/* Contenedor con Scroll para evitar desbordamiento vertical */}
+            <div className="space-y-4 max-h-[70vh] overflow-y-auto px-1">
               {error && <div className="p-3 text-sm text-red-500 bg-red-500/10 rounded-md">{error}</div>}
 
               <div className="space-y-2">
@@ -237,18 +238,30 @@ export function CategoriesManager({ categories, onCategoriesChange, preloadedIma
 
               <div className="space-y-2">
                 <Label htmlFor="block">Bloque (Color)</Label>
-                <select
-                  id="block"
-                  className="flex h-10 w-full items-center justify-between rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                  value={formData.block || ""}
-                  onChange={(e) => setFormData({ ...formData, block: e.target.value as any })}
-                >
-                  <option value="">Sin Bloque (Automático/Heredado)</option>
-                  <option value="green">Verde (Auténtico)</option>
-                  <option value="blue">Azul (Empresario)</option>
-                  <option value="cyan">Cyan (Travel)</option>
-                  <option value="pink">Rosa (Lifestyle)</option>
-                </select>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {[
+                    { id: "green", color: "#70e54e", label: "Verde" },
+                    { id: "blue", color: "#4771ff", label: "Azul" },
+                    { id: "cyan", color: "#3ffcff", label: "Cyan" },
+                    { id: "pink", color: "#e87bff", label: "Rosa" },
+                  ].map((block) => (
+                    <div
+                      key={block.id}
+                      onClick={() => setFormData({ ...formData, block: block.id })}
+                      className={`cursor-pointer rounded-lg border-2 p-2 flex items-center justify-center gap-2 transition-all hover:bg-accent ${formData.block === block.id
+                        ? "border-primary bg-accent ring-1 ring-primary"
+                        : "border-transparent bg-background/50 hover:border-primary/50"
+                        }`}
+                    >
+                      <div
+                        className="w-4 h-4 rounded-full shadow-sm"
+                        style={{ backgroundColor: block.color }}
+                      />
+                      <span className="text-sm font-medium">{block.label}</span>
+                    </div>
+                  ))}
+                </div>
+                {/* Fallback hidden input/select if needed, but the state update above handles it */}
               </div>
 
               <div className="space-y-2">
@@ -323,15 +336,17 @@ export function CategoriesManager({ categories, onCategoriesChange, preloadedIma
                 </Tabs>
               </div>
 
-              <Button onClick={handleSave} disabled={isLoading || uploadProgress} className="w-full">
-                {uploadProgress
-                  ? "Subiendo imagen..."
-                  : isLoading
-                    ? "Guardando..."
-                    : editingCategory
-                      ? "Guardar Cambios"
-                      : "Crear Categoría"}
-              </Button>
+              <div className="pt-2 sticky bottom-0 bg-background pb-2 z-10">
+                <Button onClick={handleSave} disabled={isLoading || uploadProgress} className="w-full">
+                  {uploadProgress
+                    ? "Subiendo imagen..."
+                    : isLoading
+                      ? "Guardando..."
+                      : editingCategory
+                        ? "Guardar Cambios"
+                        : "Crear Categoría"}
+                </Button>
+              </div>
             </div>
           </DialogContent>
         </Dialog>

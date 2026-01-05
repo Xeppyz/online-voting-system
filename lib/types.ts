@@ -15,6 +15,7 @@ export interface Nominee {
   image_url: string | null
   clip_url: string | null
   created_at: string
+  social_links?: { platform: "instagram" | "tiktok" | "facebook"; url: string }[] | null
 }
 
 export interface Vote {

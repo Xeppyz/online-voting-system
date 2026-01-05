@@ -26,8 +26,8 @@ export function StatsOverview({ categories, totalVotes }: StatsOverviewProps) {
       icon: Trophy,
       label: "Categorías",
       value: categories.length.toString(),
-      color: "text-[#00D4FF]",
-      bgColor: "bg-[#00D4FF]/10",
+      color: "text-[#3ffcff]",
+      bgColor: "bg-[#3ffcff]/10",
     },
     {
       icon: Users,

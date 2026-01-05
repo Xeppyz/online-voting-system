@@ -9,18 +9,9 @@ import { AnalyticsTracker } from "@/components/analytics/analytics-tracker"
 const inter = Inter({ subsets: ["latin"] })
 const geistMono = Geist_Mono({ subsets: ["latin"] })
 
-const sentient = localFont({
-  src: [
-    {
-      path: "../public/fonts/Sentient-Variable.ttf",
-      style: "normal",
-    },
-    {
-      path: "../public/fonts/Sentient-VariableItalic.ttf",
-      style: "italic",
-    },
-  ],
-  variable: "--font-sentient",
+const avantique = localFont({
+  src: "../public/fonts/Avantique-Regular.ttf",
+  variable: "--font-avantique",
 })
 
 export const metadata: Metadata = {
@@ -40,7 +31,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="es" className="dark">
-      <body className={`font-sans antialiased ${sentient.variable}`} suppressHydrationWarning>
+      <body className={`font-sans antialiased ${avantique.variable}`} suppressHydrationWarning>
         {children}
         <AnalyticsTracker /> {/* [NEW] Real custom analytics */}
         <Analytics /> {/* Vercel analytics (optional, keep if user wants both) */}

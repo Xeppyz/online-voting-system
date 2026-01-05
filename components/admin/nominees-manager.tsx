@@ -43,6 +43,7 @@ export function NomineesManager({ nominees, categories, onNomineesChange }: Nomi
     category_id: "",
     image_url: "",
     clip_url: "",
+    social_links: [] as { platform: "instagram" | "tiktok" | "facebook"; url: string }[],
   })
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
@@ -66,12 +67,13 @@ export function NomineesManager({ nominees, categories, onNomineesChange }: Nomi
         category_id: nominee.category_id,
         image_url: nominee.image_url || "",
         clip_url: nominee.clip_url || "",
+        social_links: nominee.social_links || [],
       })
       setImagePreview(nominee.image_url || null)
       setVideoPreview(nominee.clip_url || null)
     } else {
       setEditingNominee(null)
-      setFormData({ name: "", description: "", category_id: "", image_url: "", clip_url: "" })
+      setFormData({ name: "", description: "", category_id: "", image_url: "", clip_url: "", social_links: [] })
       setImagePreview(null)
       setVideoPreview(null)
     }
@@ -186,6 +188,7 @@ export function NomineesManager({ nominees, categories, onNomineesChange }: Nomi
             category_id: formData.category_id,
             image_url: finalImageUrl || null,
             clip_url: finalVideoUrl || null,
+            social_links: formData.social_links && formData.social_links.length > 0 ? formData.social_links : null,
           })
           .eq("id", editingNominee.id)
           .select("*, categories(name)")
@@ -203,6 +206,7 @@ export function NomineesManager({ nominees, categories, onNomineesChange }: Nomi
             category_id: formData.category_id,
             image_url: finalImageUrl || null,
             clip_url: finalVideoUrl || null,
+            social_links: formData.social_links && formData.social_links.length > 0 ? formData.social_links : null,
           })
           .select("*, categories(name)")
           .single()
@@ -379,6 +383,76 @@ export function NomineesManager({ nominees, categories, onNomineesChange }: Nomi
                 )}
               </div>
 
+              {/* Sección de Redes Sociales */}
+              <div className="space-y-3 pt-2 border-t border-border">
+                <div className="flex items-center justify-between">
+                  <Label>Redes Sociales (Máx 2)</Label>
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 text-xs"
+                    onClick={() => {
+                      if (formData.social_links.length < 2) {
+                        setFormData({
+                          ...formData,
+                          social_links: [...formData.social_links, { platform: "instagram", url: "" }]
+                        })
+                      }
+                    }}
+                    disabled={formData.social_links.length >= 2}
+                  >
+                    <Plus className="w-3 h-3 mr-1" /> Agregar Red
+                  </Button>
+                </div>
+
+                {formData.social_links.map((link, index) => (
+                  <div key={index} className="flex gap-2 items-start">
+                    <Select
+                      value={link.platform}
+                      onValueChange={(val: "instagram" | "tiktok" | "facebook") => {
+                        const newLinks = [...formData.social_links]
+                        newLinks[index].platform = val
+                        setFormData({ ...formData, social_links: newLinks })
+                      }}
+                    >
+                      <SelectTrigger className="w-[110px]">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="instagram">Instagram</SelectItem>
+                        <SelectItem value="tiktok">TikTok</SelectItem>
+                        <SelectItem value="facebook">Facebook</SelectItem>
+                      </SelectContent>
+                    </Select>
+
+                    <Input
+                      placeholder="URL del perfil"
+                      value={link.url}
+                      onChange={(e) => {
+                        const newLinks = [...formData.social_links]
+                        newLinks[index].url = e.target.value
+                        setFormData({ ...formData, social_links: newLinks })
+                      }}
+                      className="flex-1"
+                    />
+
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => {
+                        const newLinks = formData.social_links.filter((_, i) => i !== index)
+                        setFormData({ ...formData, social_links: newLinks })
+                      }}
+                      className="text-destructive hover:text-destructive"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+
               <Button
                 onClick={handleSave}
                 disabled={isLoading || !formData.category_id || !!uploadProgress}
@@ -417,7 +491,7 @@ export function NomineesManager({ nominees, categories, onNomineesChange }: Nomi
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
           {nominees.map((nominee) => (
             <Card key={nominee.id} className="border-border/50 overflow-hidden">
-              <div className="relative h-40 bg-gradient-to-br from-primary/10 to-[#00D4FF]/10">
+              <div className="relative h-40 bg-gradient-to-br from-primary/10 to-[#3ffcff]/10">
                 {nominee.image_url ? (
                   <Image
                     src={nominee.image_url || "/placeholder.svg"}

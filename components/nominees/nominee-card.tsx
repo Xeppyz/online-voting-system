@@ -3,7 +3,7 @@
 import type { NomineeWithVotes } from "@/lib/types"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
-import { Vote, Check, User } from "lucide-react"
+import { Vote, Check, User, Instagram, Facebook } from "lucide-react"
 import { useState } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
@@ -21,6 +21,7 @@ interface NomineeCardProps {
   categoryName?: string
   showCategoryInfo?: boolean
   compact?: boolean
+  variant?: "social" | "voting"
 }
 
 export function NomineeCard({
@@ -31,11 +32,13 @@ export function NomineeCard({
   userId,
   categoryName,
   showCategoryInfo = true,
-  compact = false
+  compact = false,
+  variant = "social"
 }: NomineeCardProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [showLoginDialog, setShowLoginDialog] = useState(false)
   const [localIsVoted, setLocalIsVoted] = useState(isVoted)
+  const [isManualFlipped, setIsManualFlipped] = useState(false) // [NEW] State for mobile flip
   const router = useRouter()
 
   const handleVote = async (e: React.MouseEvent) => {
@@ -68,7 +71,7 @@ export function NomineeCard({
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ["#0066FF", "#00D4FF", "#3385FF"],
+        colors: ["#0066FF", "#3ffcff", "#3385FF"],
       })
 
       router.refresh()
@@ -84,11 +87,14 @@ export function NomineeCard({
   return (
     <>
       {/* CORRECCIÓN: Usamos h-auto en lugar de h-full para que el aspect-ratio mande sobre la altura */}
-      <div className={`group h-auto w-full aspect-[4/5] [perspective:1000px] ${compact ? 'text-sm' : ''}`}>
-        <div className="relative h-full w-full transition-all duration-500 [transform-style:preserve-3d] group-hover:[transform:rotateY(180deg)]">
+      <div
+        className={`group h-auto w-full aspect-[4/5] [perspective:1000px] ${compact ? 'text-sm' : ''} cursor-pointer`}
+        onClick={() => setIsManualFlipped(!isManualFlipped)}
+      >
+        <div className={`relative h-full w-full transition-all duration-500 [transform-style:preserve-3d] ${isManualFlipped ? "[transform:rotateY(180deg)]" : "group-hover:[transform:rotateY(180deg)]"}`}>
           {/* Front Face */}
           <div className="absolute inset-0 h-full w-full rounded-2xl overflow-hidden [backface-visibility:hidden]">
-            <div className="relative h-full w-full bg-gradient-to-br from-primary/20 to-[#00D4FF]/20">
+            <div className="relative h-full w-full bg-gradient-to-br from-primary/20 to-[#3ffcff]/20">
               {nominee.image_url ? (
                 <Image
                   src={nominee.image_url || "/placeholder.svg"}
@@ -123,61 +129,121 @@ export function NomineeCard({
           </div>
 
           {/* Back Face */}
-          <div className="absolute inset-0 h-full w-full rounded-2xl bg-card border border-border p-6 [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-center items-center text-center">
+          <div className="absolute inset-0 h-full w-full rounded-2xl bg-card border border-border p-6 [transform:rotateY(180deg)] [backface-visibility:hidden] flex flex-col justify-center items-center text-center overflow-hidden">
+
+            {/* Background Image with Low Opacity */}
+            {nominee.image_url && (
+              <>
+                <Image
+                  src={nominee.image_url}
+                  alt=""
+                  fill
+                  className="object-cover opacity-60"
+                />
+                <div className="absolute inset-0 bg-background/80" />
+              </>
+            )}
+
+            {/* Clik Logo */}
+            <div className="relative w-24 h-12 mb-2 z-20 flex-shrink-0">
+              <Image
+                src="/icon/ClikHFull.png"
+                alt="Clik Awards"
+                fill
+                className="object-contain"
+              />
+            </div>
+
             {categoryName && showCategoryInfo && (
-              <div className="absolute top-6 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-primary to-[#00D4FF] text-white text-xs font-bold shadow-lg transform hover:scale-105 transition-transform z-20">
+              <div className="absolute top-6 left-1/2 -translate-x-1/2 px-4 py-1 rounded-full bg-gradient-to-r from-primary to-[#3ffcff] text-white text-xs font-bold shadow-lg transform hover:scale-105 transition-transform z-20">
                 {categoryName}
               </div>
             )}
 
-            <div className="w-full mt-6">
-              <h3 className="text-xl font-bold text-foreground mb-1 truncate">{nominee.name}</h3>
+            <div className="w-full mt-4 relative z-10 px-2">
+              <h3 className="text-lg font-bold text-foreground mb-1 truncate">{nominee.name}</h3>
               {nominee.description && (
                 <p
-                  className="text-muted-foreground text-sm mb-4 overflow-hidden"
+                  className="text-muted-foreground text-xs overflow-hidden"
                   style={{
                     display: "-webkit-box",
-                    WebkitLineClamp: 3, // Ajustado a 3 líneas para que se vea bien
+                    WebkitLineClamp: 4,
                     WebkitBoxOrient: "vertical",
                   }}
                 >
                   {nominee.description}
                 </p>
               )}
-
-
             </div>
 
-            <div className="space-y-3 w-full">
-              <Link href={`/nominados/${nominee.id}`} className="block w-full">
-                <Button variant="outline" className="w-full">
-                  Ver Perfil
+            {variant === "voting" ? (
+              <div className="space-y-2 w-full relative z-10 mt-auto pt-2">
+                <Link href={`/nominados/${nominee.id}`} className="block w-full">
+                  <Button variant="outline" size="sm" className="w-full bg-white/5 hover:bg-white/10 text-white border-white/20 backdrop-blur-sm">
+                    Ver Perfil
+                  </Button>
+                </Link>
+
+                <Button
+                  onClick={handleVote}
+                  disabled={hasVoted || isLoading}
+                  size="sm"
+                  className={`w-full ${voted ? "bg-primary/20 text-primary hover:bg-primary/30 border border-primary/20" : "bg-primary text-primary-foreground shadow-lg shadow-primary/20"}`}
+                  variant={voted ? "outline" : "default"}
+                >
+                  {isLoading ? (
+                    "..."
+                  ) : voted ? (
+                    <>
+                      <Check className="w-4 h-4 mr-2" />
+                      Tu voto
+                    </>
+                  ) : hasVoted ? (
+                    "Ya votaste"
+                  ) : (
+                    <>
+                      <Vote className="w-4 h-4 mr-2" />
+                      Votar
+                    </>
+                  )}
                 </Button>
-              </Link>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center gap-4 mt-auto relative z-10 pt-4">
+                {nominee.social_links?.map((link, index) => {
+                  const Icon = link.platform === "instagram" ? Instagram : link.platform === "facebook" ? Facebook : null
 
-              <Button
-                onClick={handleVote}
-                disabled={hasVoted || isLoading}
-                className={`w-full ${voted ? "bg-primary/20 text-primary hover:bg-primary/30" : ""}`}
-                variant={voted ? "outline" : "default"}
-              >
-                {isLoading ? (
-                  "..."
-                ) : voted ? (
-                  <>
-                    <Check className="w-4 h-4 mr-2" />
-                    Tu voto
-                  </>
-                ) : hasVoted ? (
-                  "Ya votaste"
-                ) : (
-                  <>
-                    <Vote className="w-4 h-4 mr-2" />
-                    Votar
-                  </>
-                )}
-              </Button>
-            </div>
+                  return (
+                    <Link
+                      key={index}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+                    >
+                      {link.platform === "tiktok" ? (
+                        <svg
+                          xmlns="http://www.w3.org/2000/svg"
+                          width="20"
+                          height="20"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          strokeWidth="2"
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          className="lucide lucide-music"
+                        >
+                          <path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" />
+                        </svg>
+                      ) : Icon ? (
+                        <Icon className="w-5 h-5" />
+                      ) : null}
+                    </Link>
+                  )
+                })}
+              </div>
+            )}
           </div>
         </div>
       </div>

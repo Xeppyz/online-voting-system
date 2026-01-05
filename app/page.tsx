@@ -1,5 +1,4 @@
 import { createClient } from "@/lib/supabase/server"
-import { HeroSection } from "@/components/landing/hero-section"
 import { FeaturesSection } from "@/components/landing/features-section"
 import { HowItWorksSection } from "@/components/landing/how-it-works-section"
 import { Footer } from "@/components/landing/footer"
@@ -9,6 +8,7 @@ import { VideoSection } from "@/components/landing/video-section"
 import { ScrollAnimation } from "@/components/ui/scroll-animation"
 import { SideSection } from "@/components/landing/side-section"
 import { SponsorsSection } from "@/components/landing/sponsors-section"
+import { HeroSection } from "@/components/landing/hero-section"
 
 export default async function HomePage() {
   const supabase = await createClient()
@@ -29,7 +29,7 @@ export default async function HomePage() {
   // Fetch all nominees with their categories
   const { data: allNominees } = await supabase
     .from("nominees")
-    .select("*, categories(name, description, image_url)")
+    .select("*, categories(name, description, image_url, block)")
 
   // Calculate stats for all nominees
   let nomineesWithData: any[] = []
@@ -46,7 +46,12 @@ export default async function HomePage() {
         percentage: totalCategoryVotes > 0 ? Math.round((nomineeVotes / totalCategoryVotes) * 100) : 0,
         category_name: nominee.categories?.name || "Categoría",
         category_description: nominee.categories?.description || "",
-        category_image: nominee.categories?.image_url || null,
+        category_image: nominee.categories?.image_url
+          ? nominee.categories.image_url.includes("categorias_png")
+            ? nominee.categories.image_url
+            : nominee.categories.image_url.replace("/categorias/", "/categorias/categorias_png/")
+          : null,
+        category_block: nominee.categories?.block || null,
       }
     })
   }

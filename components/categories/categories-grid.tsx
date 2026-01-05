@@ -30,7 +30,7 @@ export function CategoriesGrid({ categories }: CategoriesGridProps) {
         <Link key={category.id} href={`/categorias/${category.id}`}>
           <div className="group relative overflow-hidden rounded-2xl bg-card border border-border hover:border-primary/50 transition-all duration-300 hover:shadow-lg hover:shadow-primary/5">
             {/* Category Image */}
-            <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/20 to-[#00D4FF]/20">
+            <div className="relative h-48 overflow-hidden bg-gradient-to-br from-primary/20 to-[#3ffcff]/20">
               {category.image_url ? (
                 <Image
                   src={category.image_url || "/placeholder.svg"}

@@ -5,20 +5,21 @@ import { NomineeCard } from "@/components/nominees/nominee-card"
 import { ArrowRight } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import Link from "next/link"
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState, useMemo } from "react"
 
 interface TopNomineesSectionProps {
   nominees: (NomineeWithVotes & {
     category_name: string
     category_description?: string
     category_image?: string | null
+    category_block?: string | null // [NEW]
   })[]
   userVotes: Record<string, string>
   userId?: string
 }
 
 type ColumnItem =
-  | { type: "category"; id: string; name: string; description?: string; image?: string | null }
+  | { type: "category"; id: string; name: string; description?: string; image?: string | null; block?: string | null } // [NEW]
   | {
     type: "nominee"
     data: NomineeWithVotes & {
@@ -28,67 +29,103 @@ type ColumnItem =
     }
   }
 
+const blockColors: Record<string, string> = {
+  green: "#70e54e",
+  blue: "#4771ff",
+  cyan: "#3ffcff",
+  pink: "#e87bff",
+}
+
 export function TopNomineesSection({ nominees, userVotes, userId }: TopNomineesSectionProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [isPaused, setIsPaused] = useState(false)
+  const [rotationSeed, setRotationSeed] = useState(0)
+
+  // Rotación aleatoria cada minuto
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setRotationSeed((prev) => prev + 1)
+    }, 60000) // 1 minuto
+    return () => clearInterval(interval)
+  }, [])
+
+  const columns = useMemo(() => {
+    if (nominees.length === 0) return []
+
+    // 1. Agrupar
+    const nomineesByCategory: Record<string, typeof nominees> = {}
+    nominees.forEach((nominee) => {
+      if (!nomineesByCategory[nominee.category_id]) {
+        nomineesByCategory[nominee.category_id] = []
+      }
+      nomineesByCategory[nominee.category_id].push(nominee)
+    })
+
+    const items: ColumnItem[] = []
+
+    Object.entries(nomineesByCategory).forEach(([categoryId, categoryNominees]) => {
+      // Push Category
+      items.push({
+        type: "category",
+        id: categoryId,
+        name: categoryNominees[0].category_name,
+        description: categoryNominees[0].category_description,
+        image: categoryNominees[0].category_image,
+        block: categoryNominees[0].category_block,
+      })
+
+      // Filter & Shuffle Nominees
+      let selected = [...categoryNominees]
+      if (selected.length > 4) {
+        // Shuffle simple basado en Math.random (se re-ejecuta cuando cambia rotationSeed)
+        selected.sort(() => Math.random() - 0.5)
+        selected = selected.slice(0, 4)
+      }
+
+      selected.forEach((nominee) => {
+        items.push({
+          type: "nominee",
+          data: nominee,
+        })
+      })
+    })
+
+    // Build Columns
+    const cols: ColumnItem[][] = []
+    let currentColumn: ColumnItem[] = []
+
+    items.forEach((item) => {
+      if (item.type === "category") {
+        if (currentColumn.length > 0) {
+          cols.push(currentColumn)
+          currentColumn = []
+        }
+        currentColumn.push(item)
+      } else {
+        if (currentColumn.length === 2) {
+          cols.push(currentColumn)
+          currentColumn = []
+        }
+        currentColumn.push(item)
+      }
+    })
+    if (currentColumn.length > 0) {
+      cols.push(currentColumn)
+    }
+    return cols
+  }, [nominees, rotationSeed])
 
   if (nominees.length === 0) return null
 
-  // --- 1. PREPARACIÓN DE DATOS (Igual que antes) ---
-  const nomineesByCategory: Record<string, typeof nominees> = {}
-  nominees.forEach((nominee) => {
-    if (!nomineesByCategory[nominee.category_id]) {
-      nomineesByCategory[nominee.category_id] = []
-    }
-    nomineesByCategory[nominee.category_id].push(nominee)
-  })
-
-  const items: ColumnItem[] = []
-  Object.entries(nomineesByCategory).forEach(([categoryId, categoryNominees]) => {
-    items.push({
-      type: "category",
-      id: categoryId,
-      name: categoryNominees[0].category_name,
-      description: categoryNominees[0].category_description,
-      image: categoryNominees[0].category_image,
-    })
-    categoryNominees.forEach((nominee) => {
-      items.push({
-        type: "nominee",
-        data: nominee,
-      })
-    })
-  })
-
-  const columns: ColumnItem[][] = []
-  let currentColumn: ColumnItem[] = []
-
-  items.forEach((item) => {
-    if (item.type === "category") {
-      if (currentColumn.length > 0) {
-        columns.push(currentColumn)
-        currentColumn = []
-      }
-      currentColumn.push(item)
-    } else {
-      if (currentColumn.length === 2) {
-        columns.push(currentColumn)
-        currentColumn = []
-      }
-      currentColumn.push(item)
-    }
-  })
-  if (currentColumn.length > 0) {
-    columns.push(currentColumn)
-  }
-
-  // --- 2. DUPLICACIÓN PARA EFECTO INFINITO ---
-  const doubledColumns = [...columns, ...columns]
+  // --- 2. DUPLICACIÓN CONDICIONAL ---
+  // Solo duplicamos y animamos si hay suficientes elementos para que valga la pena (ej: 4 columnas o más)
+  const shouldAnimate = columns.length >= 4
+  const displayColumns = shouldAnimate ? [...columns, ...columns] : columns
 
   // --- 3. LÓGICA HÍBRIDA (AUTO + MANUAL) ---
   useEffect(() => {
     const scrollContainer = scrollContainerRef.current
-    if (!scrollContainer) return
+    if (!scrollContainer || !shouldAnimate) return
 
     let animationFrameId: number
     const speed = 0.5 // Velocidad del auto-scroll
@@ -121,14 +158,20 @@ export function TopNomineesSection({ nominees, userVotes, userId }: TopNomineesS
     animationFrameId = requestAnimationFrame(step)
 
     return () => cancelAnimationFrame(animationFrameId)
-  }, [isPaused, columns.length])
+  }, [isPaused, columns.length, shouldAnimate])
 
   // Función auxiliar para renderizar items (sin cambios)
   const renderItem = (item: ColumnItem) => {
     if (item.type === "category") {
+      // Determine background color based on block
+      const bgColor = item.block && blockColors[item.block] ? blockColors[item.block] : "#4771ff"
+
       return (
         <div key={`${item.type}-${item.id}`} className="h-full w-full">
-          <div className="relative group h-full min-h-[240px] w-full overflow-hidden rounded-2xl bg-[#4771ff] p-4 flex flex-col items-center justify-center text-center shadow-lg hover:shadow-xl transition-all duration-300">
+          <div
+            className="relative group h-full min-h-[240px] w-full overflow-hidden rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-lg hover:shadow-xl transition-all duration-300"
+            style={{ backgroundColor: bgColor }}
+          >
             {item.image ? (
               <img
                 src={item.image || "/placeholder.svg"}
@@ -216,9 +259,9 @@ export function TopNomineesSection({ nominees, userVotes, userId }: TopNomineesS
           }}
           // CLASES: overflow-x-auto permite el scroll manual
           // cursor-grab indica que se puede agarrar
-          className="flex overflow-x-auto pb-8 px-0 gap-4 cursor-grab active:cursor-grabbing [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:none]"
+          className={`flex overflow-x-auto pb-8 px-0 gap-4 cursor-grab active:cursor-grabbing [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:none] ${!shouldAnimate ? "justify-center" : ""}`}
         >
-          {doubledColumns.map((column, index) => (
+          {displayColumns.map((column, index) => (
             <div
               key={index}
               className="flex flex-col gap-4 flex-shrink-0 w-[260px] md:w-[300px]"

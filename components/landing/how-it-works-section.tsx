@@ -45,7 +45,7 @@ export function HowItWorksSection() {
               )}
 
               <div className="relative z-10 text-center">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-primary to-[#00D4FF] text-primary-foreground text-xl font-bold mb-4 shadow-lg shadow-primary/25">
+                <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-br from-primary to-[#3ffcff] text-primary-foreground text-xl font-bold mb-4 shadow-lg shadow-primary/25">
                   {step.number}
                 </div>
                 <h3 className="text-lg font-semibold text-foreground mb-2">{step.title}</h3>

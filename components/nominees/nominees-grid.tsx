@@ -10,9 +10,10 @@ interface NomineesGridProps {
   categoryId: string
   userVote: string | null
   userId?: string
+  themeColor: string
 }
 
-export function NomineesGrid({ nominees, categoryId, userVote, userId }: NomineesGridProps) {
+export function NomineesGrid({ nominees, categoryId, userVote, userId, themeColor }: NomineesGridProps) {
   if (nominees.length === 0) {
     return (
       <div className="text-center py-16">
@@ -26,23 +27,37 @@ export function NomineesGrid({ nominees, categoryId, userVote, userId }: Nominee
   }
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-      {nominees.map((nominee, index) => (
-        <motion.div
-          key={nominee.id}
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: index * 0.05 }}
-        >
-          <NomineeCard
-            nominee={nominee}
-            categoryId={categoryId}
-            isVoted={userVote === nominee.id}
-            hasVoted={!!userVote}
-            userId={userId}
-          />
-        </motion.div>
-      ))}
-    </div>
+    <section className="relative py-12 px-4 sm:px-6 lg:px-8 rounded-3xl overflow-hidden">
+      {/* Background with theme color */}
+      <div
+        className="absolute inset-0 opacity-10 pointer-events-none transition-colors duration-500"
+        style={{ backgroundColor: themeColor }}
+      />
+
+      {/* Radial Gradient for depth */}
+      <div
+        className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/50 pointer-events-none"
+      />
+
+      <div className="relative z-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {nominees.map((nominee, index) => (
+          <motion.div
+            key={nominee.id}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.05 }}
+          >
+            <NomineeCard
+              nominee={nominee}
+              categoryId={categoryId}
+              isVoted={userVote === nominee.id}
+              hasVoted={!!userVote}
+              userId={userId}
+              variant="voting"
+            />
+          </motion.div>
+        ))}
+      </div>
+    </section>
   )
 }

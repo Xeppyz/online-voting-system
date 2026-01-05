@@ -19,7 +19,7 @@ export function CategoryStats({ category }: CategoryStatsProps) {
 
   return (
     <Card className="border-border/50 overflow-hidden">
-      <CardHeader className="bg-gradient-to-r from-primary/5 to-[#00D4FF]/5 border-b border-border/50">
+      <CardHeader className="bg-gradient-to-r from-primary/5 to-[#3ffcff]/5 border-b border-border/50">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
