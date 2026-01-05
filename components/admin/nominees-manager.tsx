@@ -1,7 +1,6 @@
 "use client"
 
-import type React from "react"
-
+import { ImageCropper } from "@/components/ui/image-cropper"
 import type { Category, Nominee } from "@/lib/types"
 import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
@@ -37,6 +36,11 @@ export function NomineesManager({ nominees, categories, onNomineesChange }: Nomi
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingNominee, setEditingNominee] = useState<NomineeWithCategory | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+
+  // Cropper State
+  const [isCropperOpen, setIsCropperOpen] = useState(false)
+  const [originalImageSrc, setOriginalImageSrc] = useState<string | null>(null)
+
   const [formData, setFormData] = useState({
     name: "",
     description: "",
@@ -87,10 +91,28 @@ export function NomineesManager({ nominees, categories, onNomineesChange }: Nomi
         setError("La imagen no puede superar 5MB")
         return
       }
-      setImageFile(file)
-      setImagePreview(URL.createObjectURL(file))
+
+      const reader = new FileReader()
+      reader.addEventListener('load', () => {
+        setOriginalImageSrc(reader.result?.toString() || null)
+        setIsCropperOpen(true)
+        // Reset file input so same file can be selected again if cancelled
+        if (imageInputRef.current) imageInputRef.current.value = ""
+      })
+      reader.readAsDataURL(file)
+
       setError(null)
     }
+  }
+
+  const handleCropComplete = (croppedBlob: Blob) => {
+    // Create a File from the Blob
+    const file = new File([croppedBlob], "cropped-image.jpg", { type: "image/jpeg" })
+
+    setImageFile(file)
+    setImagePreview(URL.createObjectURL(file))
+    setOriginalImageSrc(null)
+    setIsCropperOpen(false)
   }
 
   const handleVideoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -538,6 +560,13 @@ export function NomineesManager({ nominees, categories, onNomineesChange }: Nomi
           ))}
         </div>
       )}
+      <ImageCropper
+        open={isCropperOpen}
+        onOpenChange={setIsCropperOpen}
+        imageSrc={originalImageSrc}
+        onCropComplete={handleCropComplete}
+        aspect={4 / 5} // Standard nominee card aspect ratio
+      />
     </div>
   )
 }

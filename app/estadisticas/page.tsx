@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
-import { StatsContent } from "@/components/stats/stats-content"
+import { AdvancedStats } from "@/components/admin/advanced-stats"
 import { Navbar } from "@/components/landing/navbar"
 
 export default async function StatsPage() {
@@ -68,7 +68,7 @@ export default async function StatsPage() {
           </p>
         </div>
 
-        <StatsContent initialCategories={categoriesWithStats} totalVotes={votes?.length || 0} />
+        <AdvancedStats initialCategories={categoriesWithStats} totalVotes={votes?.length || 0} />
       </main>
     </div>
   )

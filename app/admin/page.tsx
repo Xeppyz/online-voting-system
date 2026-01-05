@@ -23,6 +23,8 @@ export default async function AdminPage() {
   // Get all data
   const { data: categories } = await supabase.from("categories").select("*").order("name")
   const { data: nominees } = await supabase.from("nominees").select("*, categories(name)").order("name")
+  const { data: galleryItems } = await supabase.from("gallery_items").select("*").order("published_at", { ascending: false })
+  const { data: sponsors } = await supabase.from("sponsors").select("*").order("name")
   const { data: votes } = await supabase.from("votes").select("*")
 
   // Calculate Real Metrics from Votes
@@ -50,6 +52,8 @@ export default async function AdminPage() {
     <AdminDashboard
       initialCategories={categories || []}
       initialNominees={nominees || []}
+      initialGalleryItems={galleryItems || []}
+      initialSponsors={sponsors || []}
       totalVotes={votes?.length || 0}
       votes={votes || []}
       uniqueVoters={uniqueVoters}

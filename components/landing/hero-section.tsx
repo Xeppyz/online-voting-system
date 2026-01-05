@@ -35,7 +35,7 @@ export async function HeroSection() {
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <div className="space-y-8">
                     {/* Badge */}
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary mt-24 md:mt-0">
                         <span className="text-sm font-medium uppercase tracking-wide font-sans">Primer Edición de los Clikaward Enero 2026 - Managua - Nicaragua</span>
                     </div>
 

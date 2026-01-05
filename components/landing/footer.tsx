@@ -7,8 +7,16 @@ export function Footer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="flex flex-col gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              <img src="/icon/ClikHFull.png" alt="Clikawards" className="h-8 w-auto object-contain" />
+            <Link
+              href="https://www.instagram.com/clikawards_nic/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+            >
+              <div className="w-8 h-32 rounded-full bg-primary" />
+              <span className="text-4xl font-black uppercase tracking-tighter">
+                Clik<br /><span className="text-primary">Awards</span>
+              </span>
             </Link>
             <div className="flex items-center gap-4 mt-2">
               <img src="/icon/LOGOPERFILRSS.png" alt="RSS" className="h-8 w-auto opacity-80 hover:opacity-100 transition-opacity" />

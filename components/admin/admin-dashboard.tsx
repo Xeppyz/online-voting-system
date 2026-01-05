@@ -7,7 +7,9 @@ import { AdminHeader } from "./admin-header"
 import { AdminOverview } from "./admin-overview"
 import { CategoriesManager } from "./categories-manager"
 import { NomineesManager } from "./nominees-manager"
-import { LayoutGrid, Users, BarChart3 } from "lucide-react"
+import { GalleryManager } from "./gallery-manager"
+import { SponsorsManager } from "./sponsors-manager"
+import { LayoutGrid, Users, BarChart3, Image as ImageIcon, Briefcase } from "lucide-react"
 
 interface NomineeWithCategory extends Nominee {
   categories: { name: string } | null
@@ -16,6 +18,8 @@ interface NomineeWithCategory extends Nominee {
 interface AdminDashboardProps {
   initialCategories: Category[]
   initialNominees: NomineeWithCategory[]
+  initialGalleryItems: any[]
+  initialSponsors: any[]
   totalVotes: number
   votes?: any[]
   uniqueVoters: number
@@ -26,6 +30,8 @@ interface AdminDashboardProps {
 export function AdminDashboard({
   initialCategories,
   initialNominees,
+  initialGalleryItems = [],
+  initialSponsors = [],
   totalVotes,
   votes = [],
   uniqueVoters,
@@ -34,6 +40,8 @@ export function AdminDashboard({
 }: AdminDashboardProps) {
   const [categories, setCategories] = useState(initialCategories)
   const [nominees, setNominees] = useState(initialNominees)
+  const [galleryItems, setGalleryItems] = useState(initialGalleryItems)
+  const [sponsors, setSponsors] = useState(initialSponsors)
 
   return (
     <div className="min-h-screen bg-background">
@@ -59,6 +67,14 @@ export function AdminDashboard({
               <Users className="w-4 h-4" />
               <span className="hidden sm:inline">Nominados</span>
             </TabsTrigger>
+            <TabsTrigger value="gallery" className="flex items-center gap-2">
+              <ImageIcon className="w-4 h-4" />
+              <span className="hidden sm:inline">Galería</span>
+            </TabsTrigger>
+            <TabsTrigger value="sponsors" className="flex items-center gap-2">
+              <Briefcase className="w-4 h-4" />
+              <span className="hidden sm:inline">Patrocinadores</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
@@ -82,6 +98,14 @@ export function AdminDashboard({
 
           <TabsContent value="nominees">
             <NomineesManager nominees={nominees} categories={categories} onNomineesChange={setNominees} />
+          </TabsContent>
+
+          <TabsContent value="gallery">
+            <GalleryManager items={galleryItems} onItemsChange={setGalleryItems} />
+          </TabsContent>
+
+          <TabsContent value="sponsors">
+            <SponsorsManager sponsors={sponsors} onSponsorsChange={setSponsors} />
           </TabsContent>
         </Tabs>
       </main>

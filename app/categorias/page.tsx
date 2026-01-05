@@ -78,8 +78,8 @@ export default async function CategoriesPage() {
       <Navbar />
       <main className="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-[1920px] mx-auto">
         <div className="text-center mb-16">
-          <h1 className="text-5xl sm:text-7xl font-black mb-6 tracking-tighter uppercase">
-            Categorías <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#70e54e] via-[#4771ff] to-[#e87bff]">Clik</span>
+          <h1 className="text-5xl sm:text-7xl font-black mb-6 tracking-tighter uppercase flex items-center justify-center gap-4">
+            Categorías
           </h1>
           <p className="text-xl text-white/60 max-w-2xl mx-auto font-light">
             Explora y vota por el talento nicaragüense

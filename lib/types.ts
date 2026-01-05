@@ -35,3 +35,21 @@ export interface CategoryWithNominees extends Category {
   nominees: NomineeWithVotes[]
   total_votes: number
 }
+
+export interface GalleryItem {
+  id: string
+  title: string
+  media_url: string
+  media_type: "image" | "video"
+  published_at: string
+  created_at: string
+}
+
+export interface Sponsor {
+  id: string
+  name: string
+  description: string | null
+  logo_url: string | null
+  created_at: string
+  social_links?: { platform: "instagram" | "tiktok" | "facebook" | "website"; url: string }[] | null
+}

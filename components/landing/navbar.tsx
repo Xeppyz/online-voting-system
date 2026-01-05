@@ -2,10 +2,12 @@
 
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Vote, Menu, X } from "lucide-react"
+import { Vote, Menu, X, User as UserIcon } from "lucide-react"
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
+import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet"
+import { signOut } from "@/lib/auth-actions"
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -45,75 +47,97 @@ export function Navbar() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center gap-8">
             <Link href="/categorias" className="text-sm font-medium hover:text-primary transition-colors">
               Categorías
             </Link>
-            {isAdmin && (
-              <Link href="/admin" className="text-muted-foreground hover:text-foreground transition-colors">
-                Admin
-              </Link>
-            )}
-            {!isLoading &&
-              (user ? (
-                <Link href="/perfil">
-                  <Button variant="outline" size="sm">
-                    Mi Perfil
-                  </Button>
-                </Link>
-              ) : (
-                <Link href="/auth/login">
-                  <Button size="sm">Iniciar Sesión</Button>
-                </Link>
-              ))}
-          </div>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden p-2 text-foreground"
-            onClick={() => setIsOpen(!isOpen)}
-            aria-label={isOpen ? "Cerrar menú" : "Abrir menú"}
-          >
-            {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile Navigation */}
-      {isOpen && (
-        <div className="md:hidden bg-background border-b border-border">
-          <div className="px-4 py-4 space-y-3">
-            <Link
-              href="/categorias"
-              className="block px-3 py-2 text-base font-medium hover:bg-muted rounded-md transition-colors"
-              onClick={() => setIsOpen(false)}
-            >
-              Categorías
+            <Link href="/galeria" className="text-sm font-medium hover:text-primary transition-colors">
+              Galería
             </Link>
             {isAdmin && (
-              <Link
-                href="/admin"
-                className="block text-muted-foreground hover:text-foreground transition-colors py-2"
-                onClick={() => setIsOpen(false)}
-              >
-                Admin
+              <Link href="/estadisticas" className="text-sm font-medium hover:text-primary transition-colors">
+                Estadísticas
               </Link>
             )}
-            {!isLoading &&
-              (user ? (
-                <Link href="/perfil" onClick={() => setIsOpen(false)}>
-                  <Button variant="outline" className="w-full bg-transparent">
-                    Mi Perfil
+
+            {user ? (
+              <div className="flex items-center gap-4">
+                {isAdmin && (
+                  <Link href="/admin">
+                    <Button variant="ghost" size="sm">
+                      Panel Admin
+                    </Button>
+                  </Link>
+                )}
+                <form action={signOut}>
+                  <Button variant="outline" size="sm">
+                    Cerrar Sesión
                   </Button>
-                </Link>
-              ) : (
-                <Link href="/auth/login" onClick={() => setIsOpen(false)}>
-                  <Button className="w-full">Iniciar Sesión</Button>
-                </Link>
-              ))}
+                </form>
+              </div>
+            ) : (
+              <Link href="/auth/login">
+                <Button variant="outline" size="sm" className="gap-2">
+                  <UserIcon className="w-4 h-4" />
+                  Iniciar Sesión
+                </Button>
+              </Link>
+            )}
+          </div>
+
+          {/* Mobile Menu */}
+          <div className="md:hidden">
+            <Sheet>
+              <SheetTrigger asChild>
+                <Button variant="ghost" size="icon">
+                  <Menu className="w-6 h-6" />
+                </Button>
+              </SheetTrigger>
+              <SheetContent side="right" className="bg-black/95 border-white/10 text-white">
+                <SheetHeader>
+                  <SheetTitle>
+                    <span className="sr-only">Menú de Navegación</span>
+                  </SheetTitle>
+                </SheetHeader>
+                <div className="flex flex-col gap-8 mt-8">
+                  <Link href="/categorias" className="text-lg font-medium hover:text-primary transition-colors">
+                    Categorías
+                  </Link>
+                  <Link href="/galeria" className="text-lg font-medium hover:text-primary transition-colors">
+                    Galería
+                  </Link>
+                  {isAdmin && (
+                    <Link href="/estadisticas" className="text-lg font-medium hover:text-primary transition-colors">
+                      Estadísticas
+                    </Link>
+                  )}
+                  {user ? (
+                    <>
+                      {isAdmin && (
+                        <Link href="/admin" className="text-lg font-medium hover:text-primary transition-colors">
+                          Panel Admin
+                        </Link>
+                      )}
+                      <form action={signOut}>
+                        <Button variant="outline" className="w-full">
+                          Cerrar Sesión
+                        </Button>
+                      </form>
+                    </>
+                  ) : (
+                    <Link href="/auth/login">
+                      <Button variant="outline" className="w-full gap-2">
+                        <UserIcon className="w-4 h-4" />
+                        Iniciar Sesión
+                      </Button>
+                    </Link>
+                  )}
+                </div>
+              </SheetContent>
+            </Sheet>
           </div>
         </div>
-      )}
+      </div>
     </nav>
   )
 }

@@ -11,6 +11,8 @@ import Image from "next/image"
 import { motion } from "framer-motion"
 import html2canvas from "html2canvas"
 
+import { toast } from "sonner"
+
 interface NomineeProfileProps {
   nominee: NomineeWithVotes
   category: Category
@@ -75,6 +77,9 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
         link.href = dataUrl
         link.download = `voto-${nominee.name.replace(/\s+/g, "-")}.png`
         link.click()
+        toast.success("Imagen guardada", {
+          description: "La imagen se ha descargado. ¡Ahora puedes subirla a tus redes!"
+        })
       }
     } catch (err) {
       console.error("Error generating share image", err)
@@ -267,64 +272,84 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
 
         {/* Main Card */}
         <div
-          className="relative w-full aspect-[4/5] rounded-[60px] overflow-hidden shadow-2xl"
           style={{
+            position: 'relative',
+            width: '100%',
+            aspectRatio: '4/5',
+            borderRadius: '60px',
+            overflow: 'hidden',
+            boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)',
             border: '8px solid rgba(255,255,255,0.1)',
             backgroundColor: 'rgba(255,255,255,0.05)'
           }}
         >
           {/* Glowing back */}
           <div
-            className="absolute inset-0 mix-blend-overlay"
-            style={{ backgroundImage: 'linear-gradient(to bottom right, rgba(63,252,255,0.2), rgba(147,51,234,0.2))' }}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              mixBlendMode: 'overlay',
+              backgroundImage: 'linear-gradient(to bottom right, rgba(63,252,255,0.2), rgba(147,51,234,0.2))'
+            }}
           />
 
           {nominee.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
-            <img src={nominee.image_url} alt="" className="w-full h-full object-contain" style={{ objectPosition: 'center' }} />
+            <img src={nominee.image_url} alt="" style={{ width: '100%', height: '100%', objectFit: 'contain', objectPosition: 'center' }} />
           ) : (
-            <div className="w-full h-full flex items-center justify-center" style={{ backgroundColor: 'rgba(255,255,255,0.1)' }}>
-              <User className="w-48 h-48" style={{ color: 'rgba(255,255,255,0.2)' }} />
+            <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: 'rgba(255,255,255,0.1)' }}>
+              <User style={{ width: '192px', height: '192px', color: 'rgba(255,255,255,0.2)' }} />
             </div>
           )}
 
           {/* Gradient Overlay */}
           <div
-            className="absolute inset-0"
-            style={{ backgroundImage: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%)' }}
+            style={{
+              position: 'absolute',
+              inset: 0,
+              backgroundImage: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%)'
+            }}
           />
 
           {/* Content on Image */}
-          <div className="absolute bottom-16 left-12 right-12">
+          <div style={{ position: 'absolute', bottom: '64px', left: '48px', right: '48px' }}>
             <div
-              className="inline-block px-8 py-3 rounded-full mb-6 text-3xl font-bold uppercase tracking-wider text-white"
               style={{
+                display: 'inline-block',
+                padding: '12px 32px',
+                borderRadius: '9999px',
+                marginBottom: '24px',
+                fontSize: '30px',
+                fontWeight: 'bold',
+                textTransform: 'uppercase',
+                letterSpacing: '0.05em',
+                color: 'white',
                 backgroundColor: 'rgba(255,255,255,0.1)',
                 border: '1px solid rgba(255,255,255,0.2)',
               }}
             >
               {category.name}
             </div>
-            <h1 className="text-7xl font-black uppercase text-white leading-none tracking-tight" style={{ textShadow: '0 4px 8px rgba(0,0,0,0.5)' }}>
+            <h1 style={{ fontSize: '72px', fontWeight: 900, textTransform: 'uppercase', color: 'white', lineHeight: 1, letterSpacing: '-0.025em', textShadow: '0 4px 8px rgba(0,0,0,0.5)', margin: 0 }}>
               {nominee.name}
             </h1>
           </div>
         </div>
 
         {/* Voting Text */}
-        <div className="text-center space-y-4">
-          <h2 className="text-5xl font-bold uppercase tracking-widest" style={{ color: '#3ffcff' }}>
+        <div style={{ textAlign: 'center' }}>
+          <h2 style={{ fontSize: '48px', fontWeight: 'bold', textTransform: 'uppercase', letterSpacing: '0.1em', color: '#3ffcff', margin: 0 }}>
             ¡Yo Voté Por!
           </h2>
-          <div className="w-32 h-2 mx-auto rounded-full mt-8" style={{ backgroundColor: 'rgba(255,255,255,0.2)' }} />
+          <div style={{ width: '128px', height: '8px', margin: '32px auto 0', borderRadius: '9999px', backgroundColor: 'rgba(255,255,255,0.2)' }} />
         </div>
 
         {/* Footer Tag */}
-        <div className="mt-auto text-center space-y-4">
-          <p className="text-5xl font-black tracking-tighter text-white">
+        <div style={{ marginTop: 'auto', textAlign: 'center' }}>
+          <p style={{ fontSize: '48px', fontWeight: 900, letterSpacing: '-0.05em', color: 'white', margin: '0 0 16px' }}>
             @clikawards_nic
           </p>
-          <p className="text-3xl font-medium uppercase tracking-widest" style={{ color: 'rgba(255,255,255,0.5)' }}>
+          <p style={{ fontSize: '30px', fontWeight: 500, textTransform: 'uppercase', letterSpacing: '0.1em', color: 'rgba(255,255,255,0.5)', margin: 0 }}>
             Enero 2026
           </p>
         </div>

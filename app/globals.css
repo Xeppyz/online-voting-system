@@ -5,43 +5,48 @@
 
 /* Updated to blue color palette for Armando La Plática */
 :root {
-  --background: oklch(0.98 0.005 250);
-  --foreground: oklch(0.15 0.02 250);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.15 0.02 250);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.15 0.02 250);
+  --background: #fafafa;
+  /* Zinc 50 */
+  --foreground: #09090b;
+  /* Zinc 950 */
+  --card: #ffffff;
+  --card-foreground: #09090b;
+  --popover: #ffffff;
+  --popover-foreground: #09090b;
 
   --primary: #3ffcff;
   --primary-foreground: #0a0a0a;
-  --secondary: oklch(0.95 0.02 250);
-  --secondary: oklch(0.95 0.02 250);
-  --secondary-foreground: oklch(0.2 0.02 250);
-  --muted: oklch(0.95 0.01 250);
-  --muted-foreground: oklch(0.5 0.02 250);
-  --accent: oklch(0.92 0.03 250);
-  --accent-foreground: oklch(0.2 0.02 250);
-  --destructive: oklch(0.577 0.245 27.325);
-  --destructive-foreground: oklch(1 0 0);
-  --border: oklch(0.9 0.01 250);
-  --input: oklch(0.9 0.01 250);
-  --input: oklch(0.9 0.01 250);
+  --secondary: #f4f4f5;
+  /* Zinc 100 */
+  --secondary-foreground: #18181b;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  /* Zinc 500 */
+  --accent: #f4f4f5;
+  --accent-foreground: #18181b;
+  --destructive: #ef4444;
+  /* Red 500 */
+  --destructive-foreground: #fafafa;
+  --border: #e4e4e7;
+  /* Zinc 200 */
+  --input: #e4e4e7;
   --ring: #3ffcff;
-  --chart-1: oklch(0.55 0.22 255);
-  --chart-1: oklch(0.55 0.22 255);
-  --chart-2: oklch(0.7 0.15 200);
-  --chart-3: oklch(0.6 0.2 280);
-  --chart-4: oklch(0.75 0.12 180);
-  --chart-5: oklch(0.65 0.18 220);
+
+  --chart-1: #3b82f6;
+  --chart-2: #22c55e;
+  --chart-3: #eab308;
+  --chart-4: #a855f7;
+  --chart-5: #ec4899;
+
   --radius: 0.75rem;
-  --sidebar: oklch(0.98 0.005 250);
-  --sidebar-foreground: oklch(0.15 0.02 250);
+
+  --sidebar: #fafafa;
+  --sidebar-foreground: #09090b;
   --sidebar-primary: #3cabaa;
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.92 0.03 250);
-  --sidebar-accent-foreground: oklch(0.2 0.02 250);
-  --sidebar-border: oklch(0.9 0.01 250);
-  --sidebar-border: oklch(0.9 0.01 250);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f4f4f5;
+  --sidebar-accent-foreground: #18181b;
+  --sidebar-border: #e4e4e7;
   --sidebar-ring: #3ffcff;
 
   /* Brand Colors */
@@ -54,36 +59,44 @@
 
 .dark {
   --background: #0a0a0a;
-  --foreground: #ffffff;
-  --card: oklch(0.15 0.02 250);
-  --card-foreground: #ffffff;
-  --popover: oklch(0.15 0.02 250);
-  --popover-foreground: #ffffff;
+  --foreground: #fafafa;
+  /* Zinc 50 */
+  --card: #09090b;
+  /* Zinc 950 */
+  --card-foreground: #fafafa;
+  --popover: #09090b;
+  --popover-foreground: #fafafa;
+
   --primary: #3ffcff;
   --primary-foreground: #0a0a0a;
-  --secondary: oklch(0.2 0.02 250);
-  --secondary-foreground: #ffffff;
-  --muted: oklch(0.2 0.02 250);
-  --muted-foreground: oklch(0.7 0.02 250);
-  --accent: oklch(0.22 0.03 250);
-  --accent-foreground: #ffffff;
-  --destructive: oklch(0.5 0.2 25);
-  --destructive-foreground: #ffffff;
-  --border: oklch(0.25 0.02 250);
-  --input: oklch(0.25 0.02 250);
+  --secondary: #27272a;
+  /* Zinc 800 */
+  --secondary-foreground: #fafafa;
+  --muted: #27272a;
+  --muted-foreground: #a1a1aa;
+  /* Zinc 400 */
+  --accent: #27272a;
+  --accent-foreground: #fafafa;
+  --destructive: #7f1d1d;
+  /* Red 900 */
+  --destructive-foreground: #fafafa;
+  --border: #27272a;
+  --input: #27272a;
   --ring: #3ffcff;
-  --chart-1: oklch(0.6 0.22 255);
-  --chart-2: oklch(0.65 0.15 200);
-  --chart-3: oklch(0.55 0.2 280);
-  --chart-4: oklch(0.7 0.12 180);
-  --chart-5: oklch(0.6 0.18 220);
-  --sidebar: oklch(0.15 0.02 250);
-  --sidebar-foreground: #ffffff;
+
+  --chart-1: #3b82f6;
+  --chart-2: #22c55e;
+  --chart-3: #eab308;
+  --chart-4: #a855f7;
+  --chart-5: #ec4899;
+
+  --sidebar: #09090b;
+  --sidebar-foreground: #fafafa;
   --sidebar-primary: #3cabaa;
-  --sidebar-primary-foreground: oklch(1 0 0);
-  --sidebar-accent: oklch(0.22 0.03 250);
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: oklch(0.25 0.02 250);
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #27272a;
+  --sidebar-accent-foreground: #fafafa;
+  --sidebar-border: #27272a;
   --sidebar-ring: #3ffcff;
 }
 
