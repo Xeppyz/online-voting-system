@@ -7,7 +7,6 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import type { User } from "@supabase/supabase-js"
 import { Sheet, SheetContent, SheetTrigger, SheetTitle, SheetHeader } from "@/components/ui/sheet"
-import { signOut } from "@/lib/auth-actions"
 
 export function Navbar() {
   const [isOpen, setIsOpen] = useState(false)
@@ -35,6 +34,12 @@ export function Navbar() {
 
     return () => subscription.unsubscribe()
   }, [])
+
+  const handleSignOut = async () => {
+    const supabase = createClient()
+    await supabase.auth.signOut()
+    window.location.reload()
+  }
 
   const isAdmin = user?.user_metadata?.is_admin === true
 
@@ -69,11 +74,9 @@ export function Navbar() {
                     </Button>
                   </Link>
                 )}
-                <form action={signOut}>
-                  <Button variant="outline" size="sm">
-                    Cerrar Sesión
-                  </Button>
-                </form>
+                <Button variant="outline" size="sm" onClick={handleSignOut}>
+                  Cerrar Sesión
+                </Button>
               </div>
             ) : (
               <Link href="/auth/login">
@@ -118,11 +121,9 @@ export function Navbar() {
                           Panel Admin
                         </Link>
                       )}
-                      <form action={signOut}>
-                        <Button variant="outline" className="w-full">
-                          Cerrar Sesión
-                        </Button>
-                      </form>
+                      <Button variant="outline" className="w-full" onClick={handleSignOut}>
+                        Cerrar Sesión
+                      </Button>
                     </>
                   ) : (
                     <Link href="/auth/login">

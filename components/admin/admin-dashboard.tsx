@@ -9,7 +9,8 @@ import { CategoriesManager } from "./categories-manager"
 import { NomineesManager } from "./nominees-manager"
 import { GalleryManager } from "./gallery-manager"
 import { SponsorsManager } from "./sponsors-manager"
-import { LayoutGrid, Users, BarChart3, Image as ImageIcon, Briefcase } from "lucide-react"
+import { SettingsManager } from "./settings-manager"
+import { LayoutGrid, Users, BarChart3, Image as ImageIcon, Briefcase, Settings } from "lucide-react"
 
 interface NomineeWithCategory extends Nominee {
   categories: { name: string } | null
@@ -75,6 +76,10 @@ export function AdminDashboard({
               <Briefcase className="w-4 h-4" />
               <span className="hidden sm:inline">Patrocinadores</span>
             </TabsTrigger>
+            <TabsTrigger value="settings" className="flex items-center gap-2">
+              <Settings className="w-4 h-4" />
+              <span className="hidden sm:inline">Configuración</span>
+            </TabsTrigger>
           </TabsList>
 
           <TabsContent value="overview">
@@ -106,6 +111,10 @@ export function AdminDashboard({
 
           <TabsContent value="sponsors">
             <SponsorsManager sponsors={sponsors} onSponsorsChange={setSponsors} />
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <SettingsManager />
           </TabsContent>
         </Tabs>
       </main>

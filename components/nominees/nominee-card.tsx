@@ -11,6 +11,9 @@ import { LoginDialog } from "@/components/auth/login-dialog"
 import Link from "next/link"
 import Image from "next/image"
 import confetti from "canvas-confetti"
+import { useAnonymousVoteStatus } from "@/hooks/use-anonymous-vote-status"
+import FingerprintJS from "@fingerprintjs/fingerprintjs"
+import { toast } from "sonner"
 
 interface NomineeCardProps {
   nominee: NomineeWithVotes
@@ -39,6 +42,13 @@ export function NomineeCard({
   const [showLoginDialog, setShowLoginDialog] = useState(false)
   const [localIsVoted, setLocalIsVoted] = useState(isVoted)
   const [isManualFlipped, setIsManualFlipped] = useState(false) // [NEW] State for mobile flip
+
+  // Hook for anonymous vote persistence
+  const { hasVotedInCategory: anonHasVotedCat, votedForNominee: anonVotedNominee, loading: anonLoading } = useAnonymousVoteStatus(categoryId, nominee.id, userId)
+
+  const effectiveIsVoted = isVoted || localIsVoted || anonVotedNominee
+  const effectiveHasVoted = hasVoted || localIsVoted || anonHasVotedCat || anonVotedNominee
+
   const router = useRouter()
 
   const handleVote = async (e: React.MouseEvent) => {
@@ -46,6 +56,52 @@ export function NomineeCard({
     e.stopPropagation()
 
     if (!userId) {
+      const supabase = createClient()
+      const { data: settings } = await supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "enable_anonymous_voting")
+        .single()
+
+      if (settings?.value === true) {
+        setIsLoading(true)
+        try {
+          const fp = await FingerprintJS.load()
+          const result = await fp.get()
+          const deviceId = result.visitorId
+
+          const { error } = await supabase.from("votes").insert({
+            device_id: deviceId,
+            nominee_id: nominee.id,
+            category_id: categoryId,
+          })
+
+          if (error) {
+            if (error.code === "23505") {
+              toast.error("Ya has votado desde este dispositivo")
+              setLocalIsVoted(true)
+              return
+            }
+            throw error
+          }
+
+          setLocalIsVoted(true)
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ["#0066FF", "#3ffcff", "#3385FF"],
+          })
+          router.refresh()
+        } catch (error) {
+          console.error("Error anonymous voting:", error)
+          toast.error("Error al votar")
+        } finally {
+          setIsLoading(false)
+        }
+        return
+      }
+
       setShowLoginDialog(true)
       return
     }
@@ -77,12 +133,13 @@ export function NomineeCard({
       router.refresh()
     } catch (error) {
       console.error("Error voting:", error)
+      toast.error("Error al votar")
     } finally {
       setIsLoading(false)
     }
   }
 
-  const voted = localIsVoted || isVoted
+  const voted = effectiveIsVoted
 
   return (
     <>
@@ -186,7 +243,7 @@ export function NomineeCard({
 
                 <Button
                   onClick={handleVote}
-                  disabled={hasVoted || isLoading}
+                  disabled={effectiveHasVoted || isLoading || (anonLoading && !userId)}
                   size="sm"
                   className={`w-full ${voted ? "bg-primary/20 text-primary hover:bg-primary/30 border border-primary/20" : "bg-primary text-primary-foreground shadow-lg shadow-primary/20"}`}
                   variant={voted ? "outline" : "default"}
@@ -198,7 +255,7 @@ export function NomineeCard({
                       <Check className="w-4 h-4 mr-2" />
                       Tu voto
                     </>
-                  ) : hasVoted ? (
+                  ) : effectiveHasVoted ? (
                     "Ya votaste"
                   ) : (
                     <>

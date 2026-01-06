@@ -10,6 +10,8 @@ import Link from "next/link"
 import Image from "next/image"
 import { motion } from "framer-motion"
 import html2canvas from "html2canvas"
+import FingerprintJS from "@fingerprintjs/fingerprintjs"
+import { useAnonymousVoteStatus } from "@/hooks/use-anonymous-vote-status"
 
 import { createClient } from "@/lib/supabase/client"
 import confetti from "canvas-confetti"
@@ -28,16 +30,81 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
   const [showLoginDialog, setShowLoginDialog] = useState(false)
   const [showVideo, setShowVideo] = useState(false)
   const [localIsVoted, setLocalIsVoted] = useState(isVoted)
+
+  // Hook for anonymous vote persistence
+  const { hasVotedInCategory: anonHasVotedCat, votedForNominee: anonVotedNominee, loading: anonLoading } = useAnonymousVoteStatus(category.id, nominee.id, userId)
+
   const router = useRouter()
   const shareRef = useRef<HTMLDivElement>(null)
 
+  // Merge server/local/anonymous states
+  const effectiveIsVoted = isVoted || localIsVoted || anonVotedNominee
+  const effectiveHasVotedInCategory = hasVotedInCategory || localIsVoted || anonHasVotedCat
+
+  // Determine if we are still checking (only if not logged in)
+  const isCheckingAuth = !userId && anonLoading
+
   const handleVote = async () => {
+    // 1. Check if user is logged in
     if (!userId) {
+      // 2. If not logged in, check if anonymous voting is enabled
+      const supabase = createClient()
+      const { data: settings } = await supabase
+        .from("app_settings")
+        .select("value")
+        .eq("key", "enable_anonymous_voting")
+        .single()
+
+      if (settings?.value === true) {
+        // 3. Anonymous voting enabled: Generate Fingerprint
+        setIsLoading(true)
+        try {
+          const fp = await FingerprintJS.load()
+          const result = await fp.get()
+          const deviceId = result.visitorId
+
+          // 4. Submit anonymous vote
+          const { error } = await supabase.from("votes").insert({
+            device_id: deviceId,
+            nominee_id: nominee.id,
+            category_id: category.id,
+          })
+
+          if (error) {
+            if (error.code === "23505") { // Unique violation
+              toast.error("Ya has votado desde este dispositivo en esta categoría")
+              setLocalIsVoted(true)
+              return
+            }
+            throw error
+          }
+
+          setLocalIsVoted(true)
+
+          confetti({
+            particleCount: 100,
+            spread: 70,
+            origin: { y: 0.6 },
+            colors: ["#0066FF", "#3ffcff", "#3385FF"],
+          })
+
+          toast.success("¡Voto registrado!")
+          router.refresh()
+        } catch (error) {
+          console.error("Error anonymous voting:", error)
+          toast.error("No se pudo registrar el voto anónimo")
+        } finally {
+          setIsLoading(false)
+        }
+        return
+      }
+
+      // 5. If anonymous voting disabled, show login dialog
       setShowLoginDialog(true)
       return
     }
 
-    if (hasVotedInCategory && !isVoted) {
+    if (effectiveHasVotedInCategory && !effectiveIsVoted) {
       toast.error("Ya has votado en esta categoría")
       return
     }
@@ -134,7 +201,7 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
     }
   }
 
-  const voted = localIsVoted || isVoted
+  const voted = effectiveIsVoted
 
   return (
     <>
@@ -262,7 +329,7 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
                     <Button
                       onClick={handleShare}
                       size="lg"
-                      disabled={isLoading}
+                      disabled={isLoading || isCheckingAuth}
                       className="w-full sm:w-auto h-16 text-xl px-12 rounded-2xl bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:opacity-90 shadow-lg shadow-orange-500/20 text-white border-0 transition-transform active:scale-95"
                     >
                       <Share2 className="w-6 h-6 mr-3" />
@@ -277,14 +344,14 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
                     <Button
                       onClick={handleVote}
                       size="lg"
-                      disabled={isLoading || (hasVotedInCategory && !voted)}
+                      disabled={isLoading || (effectiveHasVotedInCategory && !voted) || isCheckingAuth}
                       className="w-full sm:w-auto h-16 text-xl px-12 rounded-2xl bg-primary text-primary-foreground hover:opacity-90 shadow-lg shadow-primary/20 transition-transform active:scale-95"
                     >
                       <img src="/icon/ISOTIPOCLIK512PX.png" alt="Votar" className="w-6 h-6 mr-3 object-contain" />
                       {isLoading ? "Registrando..." : "Votar"}
                     </Button>
 
-                    {(hasVotedInCategory && !voted) && (
+                    {(effectiveHasVotedInCategory && !voted) && (
                       <p className="text-sm text-red-400">
                         Ya has votado por otro nominado en esta categoría.
                       </p>
@@ -303,7 +370,8 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
               </div>
             </div>
 
-            {!userId && !hasVotedInCategory && (
+
+            {!userId && !effectiveHasVotedInCategory && !effectiveIsVoted && (
               <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center">
                 <p className="text-sm text-muted-foreground">
                   Para votar por este nominado, inicia sesión.
