@@ -3,6 +3,7 @@ export interface Category {
   name: string
   description: string | null
   image_url: string | null
+  aplicativo_color: string | null // [NEW] Imagen para el título de la página
   block: "green" | "blue" | "cyan" | "pink" | null // [NEW]
   created_at: string
 }

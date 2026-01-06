@@ -11,11 +11,7 @@ const features = [
     title: "Tiempo Real",
     description: "Observa cómo cambian los resultados en vivo mientras la comunidad vota.",
   },
-  {
-    icon: BarChart3,
-    title: "Estadísticas Detalladas",
-    description: "Gráficos dinámicos y porcentajes actualizados automáticamente.",
-  },
+
   {
     icon: Users,
     title: "Experiencia Interactiva",
@@ -37,7 +33,7 @@ export function FeaturesSection() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {features.map((feature) => (
             <div
               key={feature.title}

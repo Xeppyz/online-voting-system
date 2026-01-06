@@ -13,25 +13,25 @@ export default async function CategoriesPage() {
     {
       id: "green",
       color: "#70e54e", // Green
-      title: "Auténtico",
+      title: "Verde",
       filter: ["Auténtico", "Orgullo Nica", "Producción", "Country", "Comediante"],
     },
     {
       id: "blue",
       color: "#4771ff", // Blue
-      title: "Empresario",
+      title: "Azul",
       filter: ["Empresario", "Educativo", "Podcast", "Familiar", "Fitness"],
     },
     {
       id: "cyan",
       color: "#3ffcff", // Cyan
-      title: "Travel",
+      title: "Cyan",
       filter: ["Travel", "Revelación", "Polémico", "Foodie", "Duo", "Trend"],
     },
     {
       id: "pink",
       color: "#e87bff", // Pink
-      title: "Lifestyle",
+      title: "Rosa",
       filter: ["Lifestyle", "Fashionista"],
     },
   ]

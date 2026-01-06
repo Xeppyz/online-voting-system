@@ -45,9 +45,11 @@ export default function LoginPage() {
       <Card className="w-full max-w-md relative z-10 border-border/50 shadow-xl">
         <CardHeader className="text-center pb-2">
           <Link href="/" className="inline-flex items-center justify-center gap-2 mb-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-[#00D4FF] flex items-center justify-center">
-              <Vote className="w-6 h-6 text-primary-foreground" />
-            </div>
+            <img
+              src="/icon/ClikV01.png"
+              alt="Clik Awards"
+              className="h-16 w-auto object-contain"
+            />
           </Link>
           <CardTitle className="text-2xl font-bold">Bienvenido</CardTitle>
           <CardDescription className="text-muted-foreground">
@@ -89,7 +91,7 @@ export default function LoginPage() {
           </Button>
 
           <p className="text-center text-xs text-muted-foreground">
-            Al continuar, aceptas participar en las votaciones de Clikawards
+            Al continuar, aceptas participar en las votaciones de Clik Awards
           </p>
 
           <div className="pt-4 text-center">

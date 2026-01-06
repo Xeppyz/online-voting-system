@@ -33,12 +33,15 @@ export function CategoriesManager({ categories, onCategoriesChange, preloadedIma
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingCategory, setEditingCategory] = useState<Category | null>(null)
   const [isLoading, setIsLoading] = useState(false)
-  const [formData, setFormData] = useState<{ name: string, description: string, image_url: string, block?: string }>({ name: "", description: "", image_url: "", block: "" })
+  const [formData, setFormData] = useState<{ name: string, description: string, image_url: string, aplicativo_color: string, block?: string }>({ name: "", description: "", image_url: "", aplicativo_color: "", block: "" })
   const [imageFile, setImageFile] = useState<File | null>(null)
   const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [aplicativoColorFile, setAplicativoColorFile] = useState<File | null>(null) // [NEW]
+  const [aplicativoColorPreview, setAplicativoColorPreview] = useState<string | null>(null) // [NEW]
   const [uploadProgress, setUploadProgress] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const aplicativoColorInputRef = useRef<HTMLInputElement>(null) // [NEW]
   const router = useRouter()
 
   const handleOpenDialog = (category?: Category) => {
@@ -50,13 +53,16 @@ export function CategoriesManager({ categories, onCategoriesChange, preloadedIma
         name: category.name,
         description: category.description || "",
         image_url: category.image_url || "",
-        block: category.block || "", // [NEW]
+        aplicativo_color: category.aplicativo_color || "", // [NEW]
+        block: category.block || "",
       })
       setImagePreview(category.image_url || null)
+      setAplicativoColorPreview(category.aplicativo_color || null) // [NEW]
     } else {
       setEditingCategory(null)
-      setFormData({ name: "", description: "", image_url: "", block: "" }) // [NEW]
+      setFormData({ name: "", description: "", image_url: "", aplicativo_color: "", block: "" })
       setImagePreview(null)
+      setAplicativoColorPreview(null) // [NEW]
     }
     setIsDialogOpen(true)
   }
@@ -74,12 +80,34 @@ export function CategoriesManager({ categories, onCategoriesChange, preloadedIma
     }
   }
 
+  const handleAplicativoColorSelect = (e: React.ChangeEvent<HTMLInputElement>) => { // [NEW]
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        setError("La imagen principal (App Color) no puede superar 5MB")
+        return
+      }
+      setAplicativoColorFile(file)
+      setAplicativoColorPreview(URL.createObjectURL(file))
+      setError(null)
+    }
+  }
+
   const handleRemoveImage = () => {
     setImageFile(null)
     setImagePreview(null)
     setFormData({ ...formData, image_url: "" })
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
+    }
+  }
+
+  const handleRemoveAplicativoColor = () => { // [NEW]
+    setAplicativoColorFile(null)
+    setAplicativoColorPreview(null)
+    setFormData({ ...formData, aplicativo_color: "" })
+    if (aplicativoColorInputRef.current) {
+      aplicativoColorInputRef.current.value = ""
     }
   }
 
@@ -116,11 +144,22 @@ export function CategoriesManager({ categories, onCategoriesChange, preloadedIma
 
     try {
       let finalImageUrl = formData.image_url
+      let finalAplicativoColorUrl = formData.aplicativo_color // [NEW]
 
       if (imageFile) {
         const uploadedUrl = await uploadImage(imageFile)
         if (uploadedUrl) {
           finalImageUrl = uploadedUrl
+        } else {
+          setIsLoading(false)
+          return
+        }
+      }
+
+      if (aplicativoColorFile) { // [NEW]
+        const uploadedUrl = await uploadImage(aplicativoColorFile)
+        if (uploadedUrl) {
+          finalAplicativoColorUrl = uploadedUrl
         } else {
           setIsLoading(false)
           return
@@ -134,6 +173,7 @@ export function CategoriesManager({ categories, onCategoriesChange, preloadedIma
             name: formData.name,
             description: formData.description || null,
             image_url: finalImageUrl || null,
+            aplicativo_color: finalAplicativoColorUrl || null, // [NEW]
             block: formData.block || null,
           })
           .eq("id", editingCategory.id)
@@ -150,6 +190,7 @@ export function CategoriesManager({ categories, onCategoriesChange, preloadedIma
             name: formData.name,
             description: formData.description || null,
             image_url: finalImageUrl || null,
+            aplicativo_color: finalAplicativoColorUrl || null, // [NEW]
             block: formData.block || null,
           })
           .select()
@@ -334,6 +375,42 @@ export function CategoriesManager({ categories, onCategoriesChange, preloadedIma
                     )}
                   </TabsContent>
                 </Tabs>
+              </div>
+
+              {/* Nueva sección para AplicativoColor */}
+              <div className="space-y-2">
+                <Label>Imagen Principal (Título Pág. Categoría)</Label>
+
+                {aplicativoColorPreview ? (
+                  <div className="relative w-full h-40 rounded-lg overflow-hidden border border-border">
+                    <Image src={aplicativoColorPreview} alt="Preview" fill className="object-contain bg-black/50" />
+                    <button
+                      type="button"
+                      onClick={handleRemoveAplicativoColor}
+                      className="absolute top-2 right-2 p-1 rounded-full bg-background/80 hover:bg-background text-foreground"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => aplicativoColorInputRef.current?.click()}
+                    className="w-full h-24 rounded-lg border-2 border-dashed border-border hover:border-primary/50 flex flex-col items-center justify-center gap-2 transition-colors"
+                  >
+                    <div className="w-8 h-8 rounded-full bg-muted flex items-center justify-center">
+                      <ImageIcon className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                    <span className="text-sm text-muted-foreground">Subir imagen Título</span>
+                  </button>
+                )}
+                <input
+                  ref={aplicativoColorInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleAplicativoColorSelect}
+                  className="hidden"
+                />
               </div>
 
               <div className="pt-2 sticky bottom-0 bg-background pb-2 z-10">

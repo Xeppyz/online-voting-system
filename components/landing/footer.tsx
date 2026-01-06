@@ -5,7 +5,7 @@ export function Footer() {
   return (
     <footer className="py-12 border-t border-border bg-muted/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row items-center justify-between gap-6">
+        <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="flex flex-col gap-4">
             <Link
               href="https://www.instagram.com/clikawards_nic/"
@@ -13,10 +13,11 @@ export function Footer() {
               rel="noopener noreferrer"
               className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
-              <div className="w-8 h-32 rounded-full bg-primary" />
-              <span className="text-4xl font-black uppercase tracking-tighter">
-                Clik<br /><span className="text-primary">Awards</span>
-              </span>
+              <img
+                src="/icon/ClikV01.png"
+                alt="Clik Awards"
+                className="h-24 w-auto object-contain"
+              />
             </Link>
             <div className="flex items-center gap-4 mt-2">
               <img src="/icon/LOGOPERFILRSS.png" alt="RSS" className="h-8 w-auto opacity-80 hover:opacity-100 transition-opacity" />
@@ -29,15 +30,21 @@ export function Footer() {
             <Link href="/categorias" className="hover:text-foreground transition-colors">
               Categorías
             </Link>
-            <Link href="/estadisticas" className="hover:text-foreground transition-colors">
-              Estadísticas
+            <Link
+              href="https://linktr.ee/Clikawards_nic"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hover:text-foreground transition-colors"
+            >
+              Redes Sociales
             </Link>
+
             <Link href="/auth/login" className="hover:text-foreground transition-colors">
               Iniciar Sesión
             </Link>
           </div>
 
-          <p className="text-sm text-muted-foreground">© 2025 Clikawards. Todos los derechos reservados.</p>
+          <p className="text-sm text-muted-foreground">© 2026 Clik Awards. Todos los derechos reservados.</p>
         </div>
       </div>
     </footer>

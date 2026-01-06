@@ -118,9 +118,22 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
                 </span>
               </div>
 
-              <h1 className="text-5xl sm:text-7xl font-black mb-6 text-white uppercase tracking-tighter leading-none text-balance">
-                Clik <span style={{ color: themeColor }}>{category.name}</span>
-              </h1>
+              <div className="mb-6 flex justify-center lg:justify-start">
+                <h1 className="text-5xl sm:text-7xl font-black text-white uppercase tracking-tighter leading-none text-balance sr-only">
+                  Clik {category.name}
+                </h1>
+                {category.aplicativo_color ? (
+                  <img
+                    src={category.aplicativo_color}
+                    alt={`Clik ${category.name}`}
+                    className="h-20 md:h-24 w-auto object-contain"
+                  />
+                ) : (
+                  <div className="text-5xl sm:text-7xl font-black text-white uppercase tracking-tighter leading-none text-balance not-sr-only">
+                    Clik <span style={{ color: themeColor }}>{category.name}</span>
+                  </div>
+                )}
+              </div>
 
               {category.description && (
                 <p className="text-xl text-white/60 max-w-2xl text-pretty border-l-2 pl-6" style={{ borderColor: themeColor }}>

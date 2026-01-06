@@ -211,18 +211,31 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
               </div>
 
               <div className="pt-4">
-                <Button
-                  onClick={handleShare}
-                  size="lg"
-                  disabled={isLoading}
-                  className="w-full sm:w-auto h-16 text-xl px-12 rounded-2xl bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:opacity-90 shadow-lg shadow-orange-500/20 text-white border-0 transition-transform active:scale-95"
-                >
-                  <Share2 className="w-6 h-6 mr-3" />
-                  {isLoading ? "Generando Story..." : "Compartir en Historia"}
-                </Button>
-                <p className="text-xs text-muted-foreground mt-3 pl-1">
-                  * Crea una imagen personalizada lista para subir a tus historias de Instagram.
-                </p>
+                {voted ? (
+                  <>
+                    <Button
+                      onClick={handleShare}
+                      size="lg"
+                      disabled={isLoading}
+                      className="w-full sm:w-auto h-16 text-xl px-12 rounded-2xl bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:opacity-90 shadow-lg shadow-orange-500/20 text-white border-0 transition-transform active:scale-95"
+                    >
+                      <Share2 className="w-6 h-6 mr-3" />
+                      {isLoading ? "Generando Story..." : "Compartir en Historia"}
+                    </Button>
+                    <p className="text-xs text-muted-foreground mt-3 pl-1">
+                      * Crea una imagen personalizada lista para subir a tus historias de Instagram.
+                    </p>
+                  </>
+                ) : (
+                  <div className="p-6 rounded-2xl bg-white/5 border border-white/10 text-center max-w-md">
+                    <p className="text-amber-400 font-bold mb-2 uppercase tracking-wider text-sm">
+                      🔒 Función bloqueada
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      Debes votar por este nominado para poder generar y compartir la historia personalizada.
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
 
@@ -270,6 +283,7 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
               style={{ height: '160px', width: 'auto', objectFit: 'contain' }}
             />
           </div>
+
         </div>
 
         {/* Main Card */}
@@ -285,15 +299,7 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
             backgroundColor: 'rgba(255,255,255,0.05)'
           }}
         >
-          {/* Glowing back */}
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              mixBlendMode: 'overlay',
-              backgroundImage: 'linear-gradient(to bottom right, rgba(63,252,255,0.2), rgba(147,51,234,0.2))'
-            }}
-          />
+          {/* Glowing back - REMOVED per user request to avoid gradient effect */}
 
           {nominee.image_url ? (
             // eslint-disable-next-line @next/next/no-img-element
@@ -304,34 +310,9 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
             </div>
           )}
 
-          {/* Gradient Overlay */}
-          <div
-            style={{
-              position: 'absolute',
-              inset: 0,
-              backgroundImage: 'linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%)'
-            }}
-          />
-
           {/* Content on Image */}
           <div style={{ position: 'absolute', bottom: '64px', left: '48px', right: '48px' }}>
-            <div
-              style={{
-                display: 'inline-block',
-                padding: '12px 32px',
-                borderRadius: '9999px',
-                marginBottom: '24px',
-                fontSize: '30px',
-                fontWeight: 'bold',
-                textTransform: 'uppercase',
-                letterSpacing: '0.05em',
-                color: 'white',
-                backgroundColor: 'rgba(255,255,255,0.1)',
-                border: '1px solid rgba(255,255,255,0.2)',
-              }}
-            >
-              {category.name}
-            </div>
+
             <h1 style={{ fontSize: '72px', fontWeight: 900, textTransform: 'uppercase', color: 'white', lineHeight: 1, letterSpacing: '-0.025em', textShadow: '0 4px 8px rgba(0,0,0,0.5)', margin: 0 }}>
               {nominee.name}
             </h1>
@@ -355,7 +336,7 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
             Enero 2026
           </p>
         </div>
-      </div>
+      </div >
     </>
   )
 }

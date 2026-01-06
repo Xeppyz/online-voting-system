@@ -89,7 +89,7 @@ export function Navbar() {
           <div className="md:hidden">
             <Sheet>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" suppressHydrationWarning>
                   <Menu className="w-6 h-6" />
                 </Button>
               </SheetTrigger>
