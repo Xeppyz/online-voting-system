@@ -196,7 +196,7 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
                     <Link key={i} href={link.url} target="_blank" rel="noopener noreferrer">
                       <Button variant="outline" size="lg" className="h-14 px-8 border-white/10 hover:border-white/20 hover:bg-white/5 transition-all">
                         {link.platform === "tiktok" ? (
-                          <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="mr-2"><path d="M9 18V5l12-2v13" /><circle cx="6" cy="18" r="3" /><circle cx="18" cy="16" r="3" /></svg>
+                          <img src="/icon/TIKTOKWHITE.PNG" alt="TikTok" className="w-5 h-5 mr-2 object-contain" />
                         ) : Icon ? (
                           <Icon className="w-6 h-6 mr-2" />
                         ) : null}
