@@ -17,9 +17,9 @@ export default async function GalleryPage() {
 
             <main className="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-[1920px] mx-auto">
                 <div className="text-center mb-16">
-                    <h1 className="text-5xl sm:text-7xl font-black mb-6 tracking-tighter uppercase relative inline-block">
+                    <h1 className="text-5xl sm:text-7xl font-black mb-6 tracking-widest uppercase relative inline-block">
                         Galería
-                        <span className="absolute -top-6 -right-8 text-2xl rotate-12 text-primary animate-pulse">
+                        <span className="absolute -top-6 -right-8 text-2xl rotate-12 text-primary animate-pulse tracking-widest">
                             Multimedia
                         </span>
                     </h1>

@@ -40,6 +40,11 @@ export function TopNomineesSection({ nominees, userVotes, userId }: TopNomineesS
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [isPaused, setIsPaused] = useState(false)
   const [rotationSeed, setRotationSeed] = useState(0)
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   // Rotación aleatoria cada minuto
   useEffect(() => {
@@ -77,8 +82,10 @@ export function TopNomineesSection({ nominees, userVotes, userId }: TopNomineesS
       // Filter & Shuffle Nominees
       let selected = [...categoryNominees]
       if (selected.length > 4) {
-        // Shuffle simple basado en Math.random (se re-ejecuta cuando cambia rotationSeed)
-        selected.sort(() => Math.random() - 0.5)
+        // Solo mezclar en el cliente para evitar errores de hidratación
+        if (isMounted) {
+          selected.sort(() => Math.random() - 0.5)
+        }
         selected = selected.slice(0, 4)
       }
 
@@ -113,7 +120,7 @@ export function TopNomineesSection({ nominees, userVotes, userId }: TopNomineesS
       cols.push(currentColumn)
     }
     return cols
-  }, [nominees, rotationSeed])
+  }, [nominees, rotationSeed, isMounted])
 
   if (nominees.length === 0) return null
 
