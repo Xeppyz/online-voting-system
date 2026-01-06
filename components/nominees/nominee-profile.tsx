@@ -2,7 +2,7 @@
 
 import type { NomineeWithVotes, Category } from "@/lib/types"
 import { Button } from "@/components/ui/button"
-import { ArrowLeft, Play, User, Share2, Instagram, Facebook, Check } from "lucide-react"
+import { ArrowLeft, Play, User, Share2, Instagram, Facebook, Check, Vote } from "lucide-react"
 import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { LoginDialog } from "@/components/auth/login-dialog"
@@ -11,6 +11,8 @@ import Image from "next/image"
 import { motion } from "framer-motion"
 import html2canvas from "html2canvas"
 
+import { createClient } from "@/lib/supabase/client"
+import confetti from "canvas-confetti"
 import { toast } from "sonner"
 
 interface NomineeProfileProps {
@@ -25,8 +27,52 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
   const [isLoading, setIsLoading] = useState(false)
   const [showLoginDialog, setShowLoginDialog] = useState(false)
   const [showVideo, setShowVideo] = useState(false)
+  const [localIsVoted, setLocalIsVoted] = useState(isVoted)
   const router = useRouter()
   const shareRef = useRef<HTMLDivElement>(null)
+
+  const handleVote = async () => {
+    if (!userId) {
+      setShowLoginDialog(true)
+      return
+    }
+
+    if (hasVotedInCategory && !isVoted) {
+      toast.error("Ya has votado en esta categoría")
+      return
+    }
+
+    setIsLoading(true)
+
+    try {
+      const supabase = createClient()
+
+      const { error } = await supabase.from("votes").insert({
+        user_id: userId,
+        nominee_id: nominee.id,
+        category_id: category.id,
+      })
+
+      if (error) throw error
+
+      setLocalIsVoted(true)
+
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ["#0066FF", "#3ffcff", "#3385FF"],
+      })
+
+      toast.success("¡Voto registrado!")
+      router.refresh()
+    } catch (error) {
+      console.error("Error voting:", error)
+      toast.error("No se pudo registrar el voto")
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   const handleShare = async () => {
     setIsLoading(true)
@@ -88,7 +134,7 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
     }
   }
 
-  const voted = isVoted // Simplified since local state is gone with vote button removal
+  const voted = localIsVoted || isVoted
 
   return (
     <>
@@ -167,7 +213,7 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
               </Link>
 
               {/* Nominee Name */}
-              <h1 className="text-5xl sm:text-7xl font-black text-foreground uppercase tracking-tight leading-none text-balance">
+              <h1 className="text-5xl sm:text-7xl font-black text-foreground uppercase tracking-widest leading-none text-balance">
                 {nominee.name}
               </h1>
             </div>
@@ -227,13 +273,31 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
                     </p>
                   </>
                 ) : (
-                  <div className="p-6 rounded-2xl bg-white/5 border border-white/10 text-center max-w-md">
-                    <p className="text-amber-400 font-bold mb-2 uppercase tracking-wider text-sm">
-                      🔒 Función bloqueada
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Debes votar por este nominado para poder generar y compartir la historia personalizada.
-                    </p>
+                  <div className="space-y-4">
+                    <Button
+                      onClick={handleVote}
+                      size="lg"
+                      disabled={isLoading || (hasVotedInCategory && !voted)}
+                      className="w-full sm:w-auto h-16 text-xl px-12 rounded-2xl bg-primary text-primary-foreground hover:opacity-90 shadow-lg shadow-primary/20 transition-transform active:scale-95"
+                    >
+                      <Vote className="w-6 h-6 mr-3" />
+                      {isLoading ? "Registrando..." : "Votar por este nominado"}
+                    </Button>
+
+                    {(hasVotedInCategory && !voted) && (
+                      <p className="text-sm text-red-400">
+                        Ya has votado por otro nominado en esta categoría.
+                      </p>
+                    )}
+
+                    <div className="p-4 rounded-2xl bg-white/5 border border-white/10 text-center max-w-md mx-auto sm:mx-0">
+                      <p className="text-amber-400 font-bold mb-1 uppercase tracking-wider text-xs">
+                        🔒 ¡SORPRESA ESPECIAL!
+                      </p>
+                      <p className="text-xs text-muted-foreground">
+                        Al votar por tu creador favorito, tendrás desbloqueada la opción de descargar una imagen que certifica que VOTASTE en los Clik Awards 2026.
+                      </p>
+                    </div>
                   </div>
                 )}
               </div>
@@ -242,13 +306,13 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
             {!userId && !hasVotedInCategory && (
               <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center">
                 <p className="text-sm text-muted-foreground">
-                  Para votar por este nominado, regresa a la categoría o inicia sesión.
+                  Para votar por este nominado, inicia sesión.
                 </p>
               </div>
             )}
-          </motion.div>
-        </div>
-      </div>
+          </motion.div >
+        </div >
+      </div >
 
       <LoginDialog open={showLoginDialog} onOpenChange={setShowLoginDialog} />
 

@@ -45,13 +45,15 @@ export function LoginDialog({ open, onOpenChange }: LoginDialogProps) {
       <DialogContent className="sm:max-w-md">
         <DialogHeader className="text-center">
           <div className="flex justify-center mb-4">
-            <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary to-[#3ffcff] flex items-center justify-center">
-              <Vote className="w-6 h-6 text-primary-foreground" />
-            </div>
+            <img
+              src="/icon/ClikV01.png"
+              alt="Clik Awards"
+              className="h-16 w-auto object-contain"
+            />
           </div>
           <DialogTitle className="text-xl">Inicia sesión para votar</DialogTitle>
           <DialogDescription>
-            Necesitas una cuenta para participar en las votaciones de Clikawards
+            Necesitas una cuenta para participar en las votaciones de Clik Awards
           </DialogDescription>
         </DialogHeader>
 
