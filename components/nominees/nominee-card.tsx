@@ -223,7 +223,7 @@ export function NomineeCard({
                     >
                       {link.platform === "tiktok" ? (
                         <img
-                          src="/icon/TIKTOKWHITE.PNG"
+                          src="/icon/TIKTOKWHITE.png"
                           alt="TikTok"
                           className="w-5 h-5 object-contain"
                         />
