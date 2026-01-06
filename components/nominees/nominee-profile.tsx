@@ -280,7 +280,7 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
                       disabled={isLoading || (hasVotedInCategory && !voted)}
                       className="w-full sm:w-auto h-16 text-xl px-12 rounded-2xl bg-primary text-primary-foreground hover:opacity-90 shadow-lg shadow-primary/20 transition-transform active:scale-95"
                     >
-                      <Vote className="w-6 h-6 mr-3" />
+                      <img src="/icon/ISOTIPOCLIK512PX.png" alt="Votar" className="w-6 h-6 mr-3 object-contain" />
                       {isLoading ? "Registrando..." : "Votar"}
                     </Button>
 
