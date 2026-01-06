@@ -32,7 +32,7 @@ export default async function AdminPage() {
 
   // Votes over time (Group by date) - REAL Data
   // This replaces the empty "Visits" chart with a working "Votes" chart
-  const votesByDate = votes?.reduce((acc, vote) => {
+  const votesByDate: Record<string, number> = votes?.reduce((acc, vote) => {
     const date = vote.created_at.split('T')[0] // YYYY-MM-DD
     acc[date] = (acc[date] || 0) + 1
     return acc

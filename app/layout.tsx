@@ -18,8 +18,8 @@ export const metadata: Metadata = {
   title: "Click Awards 2025",
   description: "Vota por tus favoritos en los Click Awards 2025",
   icons: {
-    icon: "/icon/IsotipoClik.png",
-    shortcut: "/icon/IsotipoClik.png",
+    icon: "/icon/ISOTIPOCLIK512PX.png",
+    shortcut: "/icon/ISOTIPOCLIK512PX.png",
     apple: "/apple-icon.png",
   },
 }

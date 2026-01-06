@@ -238,7 +238,7 @@ export function TopNomineesSection({ nominees, userVotes, userId }: TopNomineesS
     <section className="py-20">
       <div className="relative w-full max-w-[100vw]">
         <div className="text-center mb-12 px-4">
-          <h2 className="text-3xl font-bold tracking-tighter text-foreground sm:text-4xl">
+          <h2 className="text-3xl font-bold tracking-widest text-foreground sm:text-4xl text-center">
             Nominados Destacados
           </h2>
           <p className="mt-4 text-muted-foreground">

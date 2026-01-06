@@ -14,7 +14,7 @@ export function VideoSection() {
                         <Play className="w-4 h-4" />
                         Highlights
                     </div>
-                    <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl text-white mb-4">
+                    <h2 className="text-3xl font-bold tracking-widest sm:text-4xl md:text-5xl text-white mb-4">
                         Vive la <span className="text-primary">Experiencia</span>
                     </h2>
                     <p className="text-gray-400 text-center max-w-[600px] mx-auto text-lg">

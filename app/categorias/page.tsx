@@ -78,7 +78,7 @@ export default async function CategoriesPage() {
       <Navbar />
       <main className="pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-[1920px] mx-auto">
         <div className="text-center mb-16">
-          <h1 className="text-5xl sm:text-7xl font-black mb-6 tracking-tighter uppercase flex items-center justify-center gap-4">
+          <h1 className="text-5xl sm:text-7xl font-black mb-6 tracking-widest uppercase flex items-center justify-center gap-4">
             Categorías
           </h1>
           <p className="text-xl text-white/60 max-w-2xl mx-auto font-light">
@@ -93,7 +93,7 @@ export default async function CategoriesPage() {
               {/* Encabezado del Grupo (Estilo Visual) */}
               <div className="pb-4 border-b-2" style={{ borderColor: group.color }}>
                 {/* Logo Simulado CLIK */}
-                <h2 className="text-3xl font-black uppercase tracking-tight flex flex-col leading-none" style={{ color: group.color }}>
+                <h2 className="text-3xl font-black uppercase tracking-widest flex flex-col leading-none" style={{ color: group.color }}>
                   <span className="text-lg opacity-80 font-bold mb-1 ml-1 text-white">Bloque</span>
                   {group.title}
                 </h2>

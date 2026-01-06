@@ -14,7 +14,7 @@ export async function SponsorsSection() {
         <section className="w-full bg-background py-16 border-t border-white/5">
             <div className="container mx-auto px-4">
                 <div className="text-center mb-12">
-                    <h2 className="text-3xl font-bold tracking-tighter text-foreground uppercase">
+                    <h2 className="text-3xl font-bold tracking-widest text-foreground uppercase">
                         Nuestros <span className="text-primary">Patrocinadores</span>
                     </h2>
                 </div>

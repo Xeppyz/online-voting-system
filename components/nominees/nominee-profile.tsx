@@ -263,10 +263,12 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
         {/* Header Logo */}
         <div className="flex flex-col items-center gap-4">
           <div className="flex items-center gap-4 mb-8">
-            <div className="w-4 h-32 rounded-full" style={{ backgroundColor: '#3ffcff' }} />
-            <h2 className="text-6xl font-black uppercase tracking-tighter" style={{ fontWeight: 900, lineHeight: 1 }}>
-              Clik<br /><span style={{ color: '#3ffcff' }}>Awards</span>
-            </h2>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src="/icon/ClikHFull.png"
+              alt="Clik Awards"
+              style={{ height: '160px', width: 'auto', objectFit: 'contain' }}
+            />
           </div>
         </div>
 
