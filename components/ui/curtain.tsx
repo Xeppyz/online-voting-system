@@ -37,6 +37,10 @@ export function Curtain() {
                     if (diff <= 0) {
                         clearInterval(timer)
                         setTimeLeft({ days: "00", hours: "00", minutes: "00", seconds: "00" })
+                        // Force reload to bypass curtain via server check
+                        setTimeout(() => {
+                            window.location.reload()
+                        }, 1000)
                         return
                     }
 

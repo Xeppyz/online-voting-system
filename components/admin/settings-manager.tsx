@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Switch } from "@/components/ui/switch"
+import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { toast } from "sonner"
 import { Loader2, Settings } from "lucide-react"
@@ -15,6 +16,7 @@ export function SettingsManager() {
     const [startDate, setStartDate] = useState("")
     const [endDate, setEndDate] = useState("")
     const [enableCurtain, setEnableCurtain] = useState(false)
+    const [showHeroCountdown, setShowHeroCountdown] = useState(true) // Default true
     const supabase = createClient()
 
     useEffect(() => {
@@ -23,38 +25,26 @@ export function SettingsManager() {
 
     const fetchSettings = async () => {
         try {
-            const { data: anonymousData } = await supabase
-                .from("app_settings")
-                .select("value")
-                .eq("key", "enable_anonymous_voting")
-                .single()
-
-            if (anonymousData) {
-                setEnableAnonymous(anonymousData.value === true)
-            }
-
-            const { data: curtainData } = await supabase
-                .from("app_settings")
-                .select("value")
-                .eq("key", "enable_website_curtain")
-                .single()
-
-            if (curtainData) {
-                setEnableCurtain(curtainData.value === true)
-            }
-
-            // Fetch dates for the inputs if needed, but they are handled separately if using controlled inputs
-            // For this component we focus on toggles. Dates are likely handled in their own effect or parent if we refactor.
-            const { data: dateSettings } = await supabase
+            const { data: settings } = await supabase
                 .from("app_settings")
                 .select("key, value")
-                .in("key", ["voting_start_date", "voting_end_date"])
+                .in("key", ["enable_anonymous_voting", "enable_website_curtain", "show_hero_countdown", "voting_start_date", "voting_end_date"])
 
-            if (dateSettings) {
-                const start = dateSettings.find(s => s.key === "voting_start_date")?.value
-                const end = dateSettings.find(s => s.key === "voting_end_date")?.value
-                if (start) setStartDate(start)
-                if (end) setEndDate(end)
+            if (settings) {
+                const anon = settings.find(s => s.key === "enable_anonymous_voting")
+                if (anon) setEnableAnonymous(anon.value === true)
+
+                const curtain = settings.find(s => s.key === "enable_website_curtain")
+                if (curtain) setEnableCurtain(curtain.value === true)
+
+                const heroCountdown = settings.find(s => s.key === "show_hero_countdown")
+                // Default to true if not present, or use value if present
+                if (heroCountdown) setShowHeroCountdown(heroCountdown.value === true)
+
+                const start = settings.find(s => s.key === "voting_start_date")
+                const end = settings.find(s => s.key === "voting_end_date")
+                if (start?.value) setStartDate(start.value)
+                if (end?.value) setEndDate(end.value)
             }
 
         } catch (error) {
@@ -107,6 +97,30 @@ export function SettingsManager() {
             console.error(error)
             toast.error("Error al guardar configuración")
             setEnableCurtain(!checked)
+        } finally {
+            setUpdating(false)
+        }
+    }
+
+    const handleToggleHeroCountdown = async (checked: boolean) => {
+        setUpdating(true)
+        try {
+            const { error } = await supabase
+                .from("app_settings")
+                .upsert({
+                    key: "show_hero_countdown",
+                    value: checked,
+                    description: "Mostrar contador en Hero Section"
+                }, { onConflict: "key" })
+
+            if (error) throw error
+
+            setShowHeroCountdown(checked)
+            toast.success("Visibilidad del contador actualizada")
+        } catch (error) {
+            console.error(error)
+            toast.error("Error al guardar configuración")
+            setShowHeroCountdown(!checked)
         } finally {
             setUpdating(false)
         }
@@ -185,9 +199,7 @@ export function SettingsManager() {
                             Activar Cortina (Coming Soon)
                         </Label>
                         <p className="text-sm text-muted-foreground">
-                            Bloquea el acceso público a toda la web y muestra una pantalla de "Próximamente" con cuenta regresiva.
-                            <br />
-                            <span className="text-amber-400 text-xs">⚠️ Solo los administradores podrán acceder a /admin.</span>
+                            Bloquea el acceso público a toda la web y muestra una pantalla de "Próximamente".
                         </p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -199,38 +211,95 @@ export function SettingsManager() {
                     </div>
                 </div>
 
-                {/* Voting Dates */}
-                <div className="grid gap-6 md:grid-cols-2">
-                    <div className="space-y-2">
-                        <Label>Fecha de Inicio</Label>
-                        <div className="flex gap-2">
-                            <input
-                                type="datetime-local"
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                value={startDate}
-                                onChange={(e) => handleDateChange("voting_start_date", e.target.value)}
-                                disabled={updating}
-                            />
-                        </div>
-                        <p className="text-xs text-muted-foreground">
-                            Antes de esta fecha, se mostrará una cuenta regresiva de "Inicia en...".
+                {/* Show Hero Countdown */}
+                <div className="flex items-center justify-between space-x-4 rounded-lg border border-white/10 p-4">
+                    <div className="space-y-0.5">
+                        <Label className="text-base font-semibold">
+                            Mostrar Contador en Hero
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                            Muestra u oculta la cuenta regresiva en la sección principal (Hero).
                         </p>
                     </div>
+                    <div className="flex items-center gap-2">
+                        <Switch
+                            checked={showHeroCountdown}
+                            onCheckedChange={handleToggleHeroCountdown}
+                            disabled={updating}
+                        />
+                    </div>
+                </div>
 
-                    <div className="space-y-2">
-                        <Label>Fecha de Fin</Label>
-                        <div className="flex gap-2">
-                            <input
-                                type="datetime-local"
-                                className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                                value={endDate}
-                                onChange={(e) => handleDateChange("voting_end_date", e.target.value)}
-                                disabled={updating}
-                            />
+                {/* Voting Dates */}
+                <div className="space-y-4">
+                    <div className="flex items-center justify-between">
+                        <Label className="text-base font-semibold">Periodo de Votación</Label>
+                        <Button
+                            variant="destructive"
+                            size="sm"
+                            onClick={async () => {
+                                if (!confirm("¿Estás seguro de querer borrar las fechas de votación?")) return
+                                setUpdating(true)
+                                try {
+                                    const updates = [
+                                        { key: "voting_start_date", value: "null", description: "Fecha de inicio de votaciones" },
+                                        { key: "voting_end_date", value: "null", description: "Fecha de fin de votaciones" }
+                                    ]
+
+                                    const { error } = await supabase
+                                        .from("app_settings")
+                                        .upsert(updates, { onConflict: "key" })
+
+                                    if (error) throw error
+
+                                    setStartDate("")
+                                    setEndDate("")
+                                    toast.success("Fechas borradas correctamente")
+                                } catch (error) {
+                                    console.error(error)
+                                    toast.error("Error al borrar fechas")
+                                } finally {
+                                    setUpdating(false)
+                                }
+                            }}
+                            disabled={updating || (!startDate && !endDate)}
+                        >
+                            Limpiar Fechas
+                        </Button>
+                    </div>
+
+                    <div className="grid gap-6 md:grid-cols-2">
+                        <div className="space-y-2">
+                            <Label>Fecha de Inicio</Label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="datetime-local"
+                                    className="flex h-10 w-full rounded-md border border-input bg-zinc-900 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-white scheme-dark"
+                                    value={startDate}
+                                    onChange={(e) => handleDateChange("voting_start_date", e.target.value)}
+                                    disabled={updating}
+                                />
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                                Antes de esta fecha, se mostrará una cuenta regresiva de "Inicia en...".
+                            </p>
                         </div>
-                        <p className="text-xs text-muted-foreground">
-                            Después de esta fecha, se mostrará "Votación Finalizada".
-                        </p>
+
+                        <div className="space-y-2">
+                            <Label>Fecha de Fin</Label>
+                            <div className="flex gap-2">
+                                <input
+                                    type="datetime-local"
+                                    className="flex h-10 w-full rounded-md border border-input bg-zinc-900 px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 text-white scheme-dark"
+                                    value={endDate}
+                                    onChange={(e) => handleDateChange("voting_end_date", e.target.value)}
+                                    disabled={updating}
+                                />
+                            </div>
+                            <p className="text-xs text-muted-foreground">
+                                Después de esta fecha, se mostrará "Votación Finalizada".
+                            </p>
+                        </div>
                     </div>
                 </div>
             </CardContent>

@@ -93,8 +93,9 @@ export default async function CategoriesPage() {
               {/* Encabezado del Grupo (Estilo Visual) */}
               <div className="pb-4 border-b-2" style={{ borderColor: group.color }}>
                 {/* Logo Simulado CLIK */}
-                <h2 className="text-3xl font-black uppercase tracking-widest flex flex-col leading-none" style={{ color: group.color }}>
-                  <span className="text-lg opacity-80 font-bold mb-1 ml-1 text-white">Bloque</span>
+                {/* Logo Simulado CLIK */}
+                <h2 className="text-3xl font-black uppercase tracking-widest flex flex-row items-baseline gap-2 sm:flex-col sm:items-start sm:gap-0 leading-none" style={{ color: group.color }}>
+                  <span className="text-lg opacity-80 font-bold sm:mb-1 sm:ml-1 text-white">Bloque</span>
                   {group.title}
                 </h2>
               </div>

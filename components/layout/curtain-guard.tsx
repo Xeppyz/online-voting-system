@@ -1,6 +1,6 @@
 "use client"
 
-import { usePathname } from "next/navigation"
+import { usePathname, useRouter } from "next/navigation"
 import { Curtain } from "@/components/ui/curtain"
 import { useEffect, useState } from "react"
 import { createClient } from "@/lib/supabase/client"
@@ -16,20 +16,54 @@ export function CurtainGuard({ children, initialEnabled = false }: CurtainGuardP
     const [isAuthorized, setIsAuthorized] = useState(false) // Allow access if logged in
     const [loading, setLoading] = useState(true)
 
+    const router = useRouter() // Use router for refresh
+
     useEffect(() => {
         const supabase = createClient()
+        let timer: NodeJS.Timeout
 
         const checkAccess = async () => {
-            // 1. Check Curtain Setting
-            const { data: setting } = await supabase
+            // 1. Fetch settings (curtain + start date)
+            const { data: settings } = await supabase
                 .from("app_settings")
-                .select("value")
-                .eq("key", "enable_website_curtain")
-                .single()
+                .select("key, value")
+                .in("key", ["enable_website_curtain", "voting_start_date"])
 
-            if (setting) {
-                setEnabled(setting.value === true)
+            let shouldEnable = false
+            let startDate: Date | null = null
+
+            if (settings) {
+                const curtainSetting = settings.find(s => s.key === "enable_website_curtain")
+                const dateSetting = settings.find(s => s.key === "voting_start_date")
+
+                if (curtainSetting?.value === true) {
+                    shouldEnable = true
+                }
+
+                if (dateSetting?.value) {
+                    startDate = new Date(dateSetting.value)
+                }
             }
+
+            // check overrides
+            if (shouldEnable && startDate && !isNaN(startDate.getTime())) {
+                const now = new Date()
+                if (now >= startDate) {
+                    shouldEnable = false // Auto-open!
+                } else {
+                    // Set timer to auto-open
+                    const diff = startDate.getTime() - now.getTime()
+                    // Max delay for setTimeout is 2^31-1 (~24.8 days), so check reasonable range
+                    if (diff > 0 && diff < 2147483647) {
+                        timer = setTimeout(() => {
+                            setEnabled(false)
+                            router.refresh()
+                        }, diff)
+                    }
+                }
+            }
+
+            setEnabled(shouldEnable)
 
             // 2. Check User Session
             const { data: { user } } = await supabase.auth.getUser()
@@ -51,13 +85,10 @@ export function CurtainGuard({ children, initialEnabled = false }: CurtainGuardP
                     event: "*",
                     schema: "public",
                     table: "app_settings",
-                    filter: "key=eq.enable_website_curtain",
                 },
                 (payload) => {
-                    const newVal = payload.new as any
-                    if (newVal) {
-                        setEnabled(newVal.value === true)
-                    }
+                    // Re-run check on any setting change (simplest way to handle dates/toggles concurrently)
+                    checkAccess()
                 }
             )
             .subscribe()
@@ -68,6 +99,7 @@ export function CurtainGuard({ children, initialEnabled = false }: CurtainGuardP
         })
 
         return () => {
+            if (timer) clearTimeout(timer)
             supabase.removeChannel(channel)
             authListener.subscription.unsubscribe()
         }

@@ -35,5 +35,6 @@ create policy "Allow authenticated insert"
 insert into app_settings (key, value, description)
 values
   ('voting_start_date', 'null'::jsonb, 'Fecha de inicio de votaciones (ISO 8601)'),
-  ('voting_end_date', 'null'::jsonb, 'Fecha de fin de votaciones (ISO 8601)')
+  ('voting_end_date', 'null'::jsonb, 'Fecha de fin de votaciones (ISO 8601)'),
+  ('show_hero_countdown', 'true'::jsonb, 'Mostrar contador en Hero Section')
 on conflict (key) do nothing;

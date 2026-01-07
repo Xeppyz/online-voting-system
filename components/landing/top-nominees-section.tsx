@@ -169,7 +169,6 @@ export function TopNomineesSection({ nominees, userVotes, userId, votingStatus =
     return () => cancelAnimationFrame(animationFrameId)
   }, [isPaused, columns.length, shouldAnimate])
 
-  // Función auxiliar para renderizar items (sin cambios)
   const renderItem = (item: ColumnItem) => {
     if (item.type === "category") {
       // Determine background color based on block
@@ -178,7 +177,7 @@ export function TopNomineesSection({ nominees, userVotes, userId, votingStatus =
       return (
         <div key={`${item.type}-${item.id}`} className="h-full w-full">
           <div
-            className="relative group h-full min-h-[240px] w-full overflow-hidden rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-lg hover:shadow-xl transition-all duration-300"
+            className="relative group h-full min-h-[160px] md:min-h-[200px] w-full overflow-hidden rounded-2xl p-4 flex flex-col items-center justify-center text-center shadow-lg hover:shadow-xl transition-all duration-300"
             style={{ backgroundColor: bgColor }}
           >
             {item.image ? (
@@ -196,7 +195,7 @@ export function TopNomineesSection({ nominees, userVotes, userId, votingStatus =
                   <div className="cursor-help flex flex-col items-center justify-center h-full w-full relative z-10">
                     {!item.image && (
                       <>
-                        <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tighter text-white mb-2 transform group-hover:scale-105 transition-transform drop-shadow-md break-words w-full">
+                        <h3 className="text-lg sm:text-2xl font-black uppercase tracking-tighter text-white mb-2 transform group-hover:scale-105 transition-transform drop-shadow-md break-words w-full">
                           {item.name}
                         </h3>
                         <div className="w-8 h-1 bg-white/40 mx-auto rounded-full" />
@@ -251,10 +250,10 @@ export function TopNomineesSection({ nominees, userVotes, userId, votingStatus =
   }
 
   return (
-    <section className="py-20">
+    <section className="py-8 md:py-12">
       <div className="relative w-full max-w-[100vw]">
-        <div className="text-center mb-12 px-4">
-          <h2 className="text-3xl font-bold tracking-widest text-foreground sm:text-4xl text-center">
+        <div className="text-center mb-6 md:mb-8 px-4">
+          <h2 className="text-xl font-bold tracking-widest text-foreground sm:text-3xl text-center">
             Nominados Destacados
           </h2>
 
@@ -273,12 +272,12 @@ export function TopNomineesSection({ nominees, userVotes, userId, votingStatus =
           }}
           // CLASES: overflow-x-auto permite el scroll manual
           // cursor-grab indica que se puede agarrar
-          className={`flex overflow-x-auto pb-8 px-0 gap-4 cursor-grab active:cursor-grabbing [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:none] ${!shouldAnimate ? "justify-center" : ""}`}
+          className={`flex overflow-x-auto pb-8 px-0 gap-3 md:gap-4 cursor-grab active:cursor-grabbing [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:none] ${!shouldAnimate ? "justify-center" : ""}`}
         >
           {displayColumns.map((column, index) => (
             <div
               key={index}
-              className="flex flex-col gap-4 flex-shrink-0 w-[260px] md:w-[300px]"
+              className="flex flex-col gap-3 md:gap-4 flex-shrink-0 w-[160px] md:w-[260px]"
             >
               {column.map((item) => renderItem(item))}
             </div>

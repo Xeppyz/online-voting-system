@@ -36,13 +36,25 @@ export default async function RootLayout({
 
   // Check initial curtain state server-side to prevent flash
   const supabase = await createClient()
-  const { data } = await supabase
+  const { data: settings } = await supabase
     .from("app_settings")
-    .select("value")
-    .eq("key", "enable_website_curtain")
-    .single()
+    .select("key, value")
+    .in("key", ["enable_website_curtain", "voting_start_date"])
 
-  const isCurtainEnabled = data?.value === true
+  const curtainEnabled = settings?.find(s => s.key === "enable_website_curtain")?.value === true
+  const startDateVal = settings?.find(s => s.key === "voting_start_date")?.value
+
+  let isCurtainEnabled = curtainEnabled
+
+  // If start date has passed, disable curtain automatically
+  if (isCurtainEnabled && startDateVal) {
+    const start = new Date(startDateVal)
+    const now = new Date()
+    // Add a small buffer or standard check
+    if (!isNaN(start.getTime()) && now >= start) {
+      isCurtainEnabled = false
+    }
+  }
 
   return (
     <html lang="es" className="dark">

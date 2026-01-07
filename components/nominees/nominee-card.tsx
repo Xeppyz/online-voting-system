@@ -181,7 +181,7 @@ export function NomineeCard({
               {/* Name on Front */}
               <div className="absolute bottom-4 left-4 right-4 text-white">
                 {/* Usamos line-clamp-2 para evitar textos muy largos */}
-                <h3 className={`${compact ? 'text-lg' : 'text-xl'} font-bold line-clamp-2 leading-tight`}>{nominee.name}</h3>
+                <h3 className={`${compact ? 'text-base md:text-lg' : 'text-lg md:text-xl'} font-bold line-clamp-2 leading-tight`}>{nominee.name}</h3>
               </div>
 
               {/* Voted Badge */}

@@ -1,3 +1,5 @@
+export const revalidate = 0
+
 import { createClient } from "@/lib/supabase/server"
 import { FeaturesSection } from "@/components/landing/features-section"
 import { HowItWorksSection } from "@/components/landing/how-it-works-section"
@@ -78,10 +80,12 @@ export default async function HomePage() {
   const { data: settings } = await supabase
     .from("app_settings")
     .select("key, value")
-    .in("key", ["voting_start_date", "voting_end_date"])
+    .in("key", ["voting_start_date", "voting_end_date", "show_hero_countdown"])
 
   const startDate = settings?.find((s) => s.key === "voting_start_date")?.value || null
   const endDate = settings?.find((s) => s.key === "voting_end_date")?.value || null
+  // Default to true if setting doesn't exist to maintain backward compatibility
+  const showHeroCountdown = settings?.find((s) => s.key === "show_hero_countdown")?.value !== false
 
   const now = new Date()
   const start = startDate ? new Date(startDate) : null
@@ -95,13 +99,6 @@ export default async function HomePage() {
     <div className="min-h-screen bg-background bg-clik-16x9 bg-cover bg-center bg-fixed">
       <Navbar />
       <main>
-        <ScrollAnimation>
-          <HeroSection votingStartDate={startDate} votingEndDate={endDate} />
-        </ScrollAnimation>
-
-        <ScrollAnimation>
-          <TopNomineesSection nominees={nomineesWithData} userVotes={userVotes} userId={user?.id} votingStatus={votingStatus} />
-        </ScrollAnimation>
 
         <SideSection />
 
@@ -110,12 +107,27 @@ export default async function HomePage() {
         </ScrollAnimation>
 
         <ScrollAnimation>
-          <FeaturesSection />
+          <HeroSection
+            votingStartDate={startDate}
+            votingEndDate={endDate}
+            showCountdown={showHeroCountdown}
+          />
         </ScrollAnimation>
+
+        <ScrollAnimation>
+          <TopNomineesSection nominees={nomineesWithData} userVotes={userVotes} userId={user?.id} votingStatus={votingStatus} />
+        </ScrollAnimation>
+
+
 
         <ScrollAnimation>
           <HowItWorksSection />
         </ScrollAnimation>
+
+        <ScrollAnimation>
+          <FeaturesSection />
+        </ScrollAnimation>
+
 
         <SponsorsSection />
       </main>
