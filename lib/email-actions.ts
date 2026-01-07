@@ -10,7 +10,7 @@ export async function sendWelcomeEmail(email: string) {
 
   try {
     const { data, error } = await resend.emails.send({
-      from: "Clik Awards <onboarding@resend.dev>",
+      from: "Clik Awards <info@clikawards.com>",
       to: email,
       subject: "🎟️ Registro Confirmado - Clik Awards 2026",
       html: `
