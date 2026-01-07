@@ -8,9 +8,10 @@ import { createClient } from "@/lib/supabase/client"
 interface CurtainGuardProps {
     children: React.ReactNode
     initialEnabled?: boolean
+    startDate?: string | null
 }
 
-export function CurtainGuard({ children, initialEnabled = false }: CurtainGuardProps) {
+export function CurtainGuard({ children, initialEnabled = false, startDate }: CurtainGuardProps) {
     const pathname = usePathname()
     const [enabled, setEnabled] = useState(initialEnabled)
     const [isAuthorized, setIsAuthorized] = useState(false) // Allow access if logged in
@@ -30,7 +31,7 @@ export function CurtainGuard({ children, initialEnabled = false }: CurtainGuardP
                 .in("key", ["enable_website_curtain", "voting_start_date"])
 
             let shouldEnable = false
-            let startDate: Date | null = null
+            let fetchedStartDate: Date | null = null
 
             if (settings) {
                 const curtainSetting = settings.find(s => s.key === "enable_website_curtain")
@@ -41,18 +42,21 @@ export function CurtainGuard({ children, initialEnabled = false }: CurtainGuardP
                 }
 
                 if (dateSetting?.value) {
-                    startDate = new Date(dateSetting.value)
+                    fetchedStartDate = new Date(dateSetting.value)
                 }
             }
 
+            // Allow override via prop if fetch fails or for initial sync
+            const effectiveStartDate = fetchedStartDate || (startDate ? new Date(startDate) : null)
+
             // check overrides
-            if (shouldEnable && startDate && !isNaN(startDate.getTime())) {
+            if (shouldEnable && effectiveStartDate && !isNaN(effectiveStartDate.getTime())) {
                 const now = new Date()
-                if (now >= startDate) {
+                if (now >= effectiveStartDate) {
                     shouldEnable = false // Auto-open!
                 } else {
                     // Set timer to auto-open
-                    const diff = startDate.getTime() - now.getTime()
+                    const diff = effectiveStartDate.getTime() - now.getTime()
                     // Max delay for setTimeout is 2^31-1 (~24.8 days), so check reasonable range
                     if (diff > 0 && diff < 2147483647) {
                         timer = setTimeout(() => {
@@ -103,7 +107,7 @@ export function CurtainGuard({ children, initialEnabled = false }: CurtainGuardP
             supabase.removeChannel(channel)
             authListener.subscription.unsubscribe()
         }
-    }, [])
+    }, [startDate, router])
 
     // Always allow admin routes and auth routes
     if (pathname?.startsWith("/admin") || pathname?.startsWith("/sign-in") || pathname?.startsWith("/auth") || pathname?.startsWith("/login")) {
@@ -121,11 +125,11 @@ export function CurtainGuard({ children, initialEnabled = false }: CurtainGuardP
     if (loading && initialEnabled) {
         // If server said enabled, show curtain while we check auth. 
         // This prevents content flash.
-        return <Curtain />
+        return <Curtain startDate={startDate} />
     }
 
     if (enabled && !isAuthorized) {
-        return <Curtain />
+        return <Curtain startDate={startDate} />
     }
 
     if (enabled && !isAuthorized) {

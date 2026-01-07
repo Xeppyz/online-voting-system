@@ -23,6 +23,9 @@ export const metadata: Metadata = {
     shortcut: "/icon/ISOTIPOCLIK512PX.png",
     apple: "/apple-icon.png",
   },
+  other: {
+    google: "notranslate",
+  },
 }
 
 import { CurtainGuard } from "@/components/layout/curtain-guard"
@@ -58,9 +61,9 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="es" className="dark">
+    <html lang="es" className="dark notranslate" translate="no">
       <body className={`font-sans antialiased ${avantique.variable}`} suppressHydrationWarning>
-        <CurtainGuard initialEnabled={isCurtainEnabled}>
+        <CurtainGuard initialEnabled={isCurtainEnabled} startDate={startDateVal}>
           {children}
         </CurtainGuard>
         <AnalyticsTracker /> {/* [NEW] Real custom analytics */}

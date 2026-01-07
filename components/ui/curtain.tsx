@@ -12,56 +12,96 @@ const avantiqueBold = localFont({
     src: "../../public/fonts/Avantique-Bold.otf",
 })
 
-export function Curtain() {
+interface CurtainProps {
+    startDate?: string | Date | null
+}
+
+export function Curtain({ startDate: propStartDate }: CurtainProps) {
     const router = useRouter()
-    const [timeLeft, setTimeLeft] = useState({
-        days: "00",
-        hours: "00",
-        minutes: "00",
-        seconds: "00",
+
+    // Helper to calculate time left
+    const calculateTimeLeft = (targetDate: Date) => {
+        const now = new Date()
+        const diff = targetDate.getTime() - now.getTime()
+
+        if (diff <= 0) {
+            return { days: "00", hours: "00", minutes: "00", seconds: "00" }
+        }
+
+        const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+        const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+
+        return {
+            days: days.toString().padStart(2, "0"),
+            hours: hours.toString().padStart(2, "0"),
+            minutes: minutes.toString().padStart(2, "0"),
+            seconds: seconds.toString().padStart(2, "0"),
+        }
+    }
+
+    const [timeLeft, setTimeLeft] = useState(() => {
+        if (propStartDate) {
+            const start = new Date(propStartDate)
+            if (!isNaN(start.getTime())) {
+                return calculateTimeLeft(start)
+            }
+        }
+        return {
+            days: "00",
+            hours: "00",
+            minutes: "00",
+            seconds: "00",
+        }
     })
 
     useEffect(() => {
-        // Buscar la fecha de inicio en supabase para el countdown
-        const fetchDates = async () => {
-            const supabase = createClient()
-            const { data } = await supabase.from("app_settings").select("value").eq("key", "voting_start_date").single()
+        let timer: NodeJS.Timeout
 
-            if (data?.value) {
-                const startDate = new Date(data.value)
+        const startTimer = (startDate: Date) => {
+            timer = setInterval(() => {
+                const now = new Date()
+                const diff = startDate.getTime() - now.getTime()
 
-                const timer = setInterval(() => {
-                    const now = new Date()
-                    const diff = startDate.getTime() - now.getTime()
+                if (diff <= 0) {
+                    clearInterval(timer)
+                    setTimeLeft({ days: "00", hours: "00", minutes: "00", seconds: "00" })
+                    // Force reload to bypass curtain via server check
+                    setTimeout(() => {
+                        window.location.reload()
+                    }, 1000)
+                    return
+                }
 
-                    if (diff <= 0) {
-                        clearInterval(timer)
-                        setTimeLeft({ days: "00", hours: "00", minutes: "00", seconds: "00" })
-                        // Force reload to bypass curtain via server check
-                        setTimeout(() => {
-                            window.location.reload()
-                        }, 1000)
-                        return
-                    }
-
-                    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-                    const seconds = Math.floor((diff % (1000 * 60)) / 1000)
-
-                    setTimeLeft({
-                        days: days.toString().padStart(2, "0"),
-                        hours: hours.toString().padStart(2, "0"),
-                        minutes: minutes.toString().padStart(2, "0"),
-                        seconds: seconds.toString().padStart(2, "0"),
-                    })
-                }, 1000)
-                return () => clearInterval(timer)
-            }
+                setTimeLeft(calculateTimeLeft(startDate))
+            }, 1000)
         }
 
-        fetchDates()
-    }, [])
+        if (propStartDate) {
+            const start = new Date(propStartDate)
+            if (!isNaN(start.getTime())) {
+                startTimer(start)
+            }
+        } else {
+            // Fallback: fetch date if not provided via props
+            const fetchDates = async () => {
+                const supabase = createClient()
+                const { data } = await supabase.from("app_settings").select("value").eq("key", "voting_start_date").single()
+
+                if (data?.value) {
+                    const startDate = new Date(data.value)
+                    setTimeLeft(calculateTimeLeft(startDate)) // Update immediately after fetch
+                    startTimer(startDate)
+                }
+            }
+            fetchDates()
+        }
+
+        return () => {
+            if (timer) clearInterval(timer)
+        }
+    }, [propStartDate])
 
     return (
         <div className="fixed inset-0 z-[9999] bg-[#0a0a0a] flex items-center justify-center overflow-hidden">
@@ -141,7 +181,10 @@ export function Curtain() {
 function TimeBlock({ value, label, isCyan = false }: { value: string, label: string, isCyan?: boolean }) {
     return (
         <div className="flex flex-col items-center gap-4">
-            <span className={`text-4xl sm:text-6xl font-medium tracking-tighter ${isCyan ? 'text-[#3ffcff]' : 'text-white'}`}>
+            <span
+                suppressHydrationWarning
+                className={`text-4xl sm:text-6xl font-medium tracking-tighter ${isCyan ? 'text-[#3ffcff]' : 'text-white'}`}
+            >
                 {value}
             </span>
             <span className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest ${isCyan ? 'text-[#3ffcff]' : 'text-[#3ffcff]'}`}>
