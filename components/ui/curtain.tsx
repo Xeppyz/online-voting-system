@@ -6,12 +6,14 @@ import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import localFont from "next/font/local"
 import { createClient } from "@/lib/supabase/client"
+import { useRouter } from "next/navigation"
 
 const avantiqueBold = localFont({
     src: "../../public/fonts/Avantique-Bold.otf",
 })
 
 export function Curtain() {
+    const router = useRouter()
     const [timeLeft, setTimeLeft] = useState({
         days: "00",
         hours: "00",
@@ -84,7 +86,17 @@ export function Curtain() {
                     transition={{ delay: 0.5 }}
                     className="text-xs sm:text-sm uppercase tracking-[0.3em] text-white font-medium mb-8"
                 >
-                    La votación inicia en
+                    La votación inicia{" "}
+                    <span
+                        onClick={(e) => {
+                            e.stopPropagation()
+                            window.location.href = "/admin"
+                        }}
+                        className="cursor-default hover:text-white transition-colors relative z-50 px-1"
+                        title=""
+                    >
+                        en
+                    </span>
                 </motion.p>
 
                 {/* Countdown */}
