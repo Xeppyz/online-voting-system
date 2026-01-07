@@ -26,6 +26,7 @@ interface NomineeCardProps {
   compact?: boolean
   variant?: "social" | "voting"
   votingStatus?: "active" | "upcoming" | "ended"
+  priority?: boolean // [NEW] - Force eager loading for carousel
 }
 
 export function NomineeCard({
@@ -38,14 +39,16 @@ export function NomineeCard({
   showCategoryInfo = true,
   compact = false,
   variant = "social",
-  votingStatus = "active"
+  votingStatus = "active",
+  priority = false
 }: NomineeCardProps) {
+  // ... existing hooks ...
   const [isLoading, setIsLoading] = useState(false)
   const [showLoginDialog, setShowLoginDialog] = useState(false)
   const [localIsVoted, setLocalIsVoted] = useState(isVoted)
-  const [isManualFlipped, setIsManualFlipped] = useState(false) // [NEW] State for mobile flip
+  const [isManualFlipped, setIsManualFlipped] = useState(false)
 
-  // Hook for anonymous vote persistence
+  // ... existing hook calls ...
   const { hasVotedInCategory: anonHasVotedCat, votedForNominee: anonVotedNominee, loading: anonLoading } = useAnonymousVoteStatus(categoryId, nominee.id, userId)
 
   const effectiveIsVoted = isVoted || localIsVoted || anonVotedNominee
@@ -54,7 +57,9 @@ export function NomineeCard({
 
   const router = useRouter()
 
+  // ... existing handleVote ...
   const handleVote = async (e: React.MouseEvent) => {
+    // ... logic ...
     e.preventDefault()
     e.stopPropagation()
 
@@ -65,6 +70,7 @@ export function NomineeCard({
     }
 
     if (!userId) {
+      // ... existing anonymous logic ...
       const supabase = createClient()
       const { data: settings } = await supabase
         .from("app_settings")
@@ -152,7 +158,6 @@ export function NomineeCard({
 
   return (
     <>
-      {/* CORRECCIÓN: Usamos h-auto en lugar de h-full para que el aspect-ratio mande sobre la altura */}
       <div
         className={`group h-auto w-full aspect-[4/5] [perspective:1000px] ${compact ? 'text-sm' : ''} cursor-pointer`}
         onClick={() => setIsManualFlipped(!isManualFlipped)}
@@ -167,6 +172,8 @@ export function NomineeCard({
                   alt={nominee.name}
                   fill
                   className="object-cover"
+                  priority={priority}
+                  sizes={compact ? "(max-width: 768px) 160px, 260px" : "(max-width: 768px) 100vw, 300px"}
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -180,7 +187,6 @@ export function NomineeCard({
 
               {/* Name on Front */}
               <div className="absolute bottom-4 left-4 right-4 text-white">
-                {/* Usamos line-clamp-2 para evitar textos muy largos */}
                 <h3 className={`${compact ? 'text-base md:text-lg' : 'text-lg md:text-xl'} font-bold line-clamp-2 leading-tight`}>{nominee.name}</h3>
               </div>
 
@@ -205,6 +211,7 @@ export function NomineeCard({
                   alt=""
                   fill
                   className="object-cover opacity-60"
+                  priority={priority} // Also apply here
                 />
                 <div className="absolute inset-0 bg-background/80" />
               </>

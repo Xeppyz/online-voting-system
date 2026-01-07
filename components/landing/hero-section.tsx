@@ -1,6 +1,7 @@
 "use client"
 
 import Link from "next/link"
+import Image from "next/image"
 import { Button } from "@/components/ui/button"
 import { Vote } from "lucide-react"
 import localFont from "next/font/local"
@@ -67,19 +68,77 @@ export function HeroSection({ votingStartDate, votingEndDate, showCountdown = tr
     }, [votingStartDate, votingEndDate, showCountdown])
 
     return (
-        <section className="relative min-h-[80vh] flex items-center justify-center overflow-hidden pt-12 md:pt-0">
-            <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <section className="relative min-h-[100dvh] md:min-h-[80vh] flex items-center justify-center overflow-hidden pt-32 md:pt-0 pb-12 md:pb-0">
+            <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 text-center w-full">
                 <div className="space-y-6">
                     {/* Badge */}
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary mt-20 md:mt-0">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary">
                         <span className="text-[10px] md:text-xs font-medium uppercase tracking-wide font-sans">Primer Edición de los Clik Award Enero 2026 - Managua - Nicaragua</span>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-12 gap-4 items-center mt-4">
+                    {/* MOBILE HERO LAYOUT */}
+                    <div className="block md:hidden w-full space-y-6 mt-4">
+                        <div className="relative w-full aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-white/10 mx-auto max-w-[400px]">
+                            <video
+                                className="absolute inset-0 w-full h-full object-cover"
+                                autoPlay
+                                muted
+                                loop
+                                playsInline
+                                poster="/placeholder.svg"
+                            >
+                                <source src="/clikaward.mp4" type="video/mp4" />
+                            </video>
+
+                            <div className="absolute inset-0 bg-black/40 z-10" />
+
+                            <div className="absolute inset-0 z-20 flex flex-col items-center justify-center p-6 text-center space-y-6">
+                                <p className="text-white text-lg font-medium drop-shadow-md max-w-[280px]">
+                                    Tu voto cuenta. Elige a tus favoritos y sé parte de la celebración más grande del año.
+                                </p>
+
+                                {showVoteButton ? (
+                                    <Link href="/categorias" className="w-full max-w-[240px]">
+                                        <Button
+                                            size="lg"
+                                            className={`w-full text-base px-6 py-6 h-auto rounded-xl bg-[#3ffcff] text-black shadow-lg shadow-[#3ffcff]/25 hover:shadow-xl hover:shadow-[#3ffcff]/30 transition-all hover:bg-[#3ffcff]/90 ${avantiqueBold.className}`}
+                                        >
+                                            <div className="relative w-6 h-6 mr-3">
+                                                <Image
+                                                    src="/icon/ISOTIPOCLIK512PX.png"
+                                                    alt="Icon"
+                                                    fill
+                                                    className="object-contain"
+                                                />
+                                            </div>
+                                            Iniciar Votación
+                                        </Button>
+                                    </Link>
+                                ) : (
+                                    <Button
+                                        size="lg"
+                                        disabled
+                                        className={`w-full max-w-[240px] text-base px-6 py-6 h-auto rounded-xl bg-white/10 text-white/50 border border-white/10 backdrop-blur-md cursor-not-allowed ${avantiqueBold.className}`}
+                                    >
+                                        {isVotingEnded ? "Votación Cerrada" : "Próximamente"}
+                                    </Button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="hidden md:grid grid-cols-1 md:grid-cols-12 gap-4 items-center mt-4">
                         {/* Left Image Block */}
                         <div className="hidden md:flex md:col-span-3 order-1 md:order-1 justify-center">
                             <div className="relative w-full aspect-[3/4] max-w-[200px] md:max-w-[240px] rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 transform rotate-[-6deg] hover:rotate-0 transition-transform duration-500">
-                                <img src="/side/side1.png" alt="Clikawards Highlights" className="object-cover w-full h-full" />
+                                <Image
+                                    src="/side/side1.png"
+                                    alt="Clikawards Highlights"
+                                    fill
+                                    className="object-cover"
+                                    priority
+                                    sizes="(max-width: 768px) 100vw, 300px"
+                                />
                             </div>
                         </div>
 
@@ -87,10 +146,13 @@ export function HeroSection({ votingStartDate, votingEndDate, showCountdown = tr
                         <div className="col-span-1 md:col-span-6 space-y-6 order-2 md:order-2">
                             {/* Main Title - Replaced with Logo */}
                             <div className="flex justify-center">
-                                <img
+                                <Image
                                     src="/icon/ClikV01.png"
                                     alt="Clik Awards Logo"
+                                    width={400}
+                                    height={200}
                                     className="w-full max-w-[180px] md:max-w-[300px] h-auto object-contain"
+                                    priority
                                 />
                             </div>
 
@@ -144,7 +206,14 @@ export function HeroSection({ votingStartDate, votingEndDate, showCountdown = tr
                         <div className="block md:col-span-3 order-3 md:order-3">
                             <div className="flex justify-center">
                                 <div className="relative w-full aspect-[3/4] max-w-[200px] md:max-w-[240px] rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 transform rotate-[6deg] hover:rotate-0 transition-transform duration-500">
-                                    <img src="/side/side1.1.png" alt="Clikawards Highlights" className="object-cover w-full h-full" />
+                                    <Image
+                                        src="/side/side1.1.png"
+                                        alt="Clikawards Highlights"
+                                        fill
+                                        className="object-cover"
+                                        priority
+                                        sizes="(max-width: 768px) 100vw, 300px"
+                                    />
                                 </div>
                             </div>
                         </div>

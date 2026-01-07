@@ -1,4 +1,4 @@
-export const revalidate = 0
+export const revalidate = 60 // Revalidate every minute for better performance
 
 import { createClient } from "@/lib/supabase/server"
 import { FeaturesSection } from "@/components/landing/features-section"
@@ -11,6 +11,7 @@ import { ScrollAnimation } from "@/components/ui/scroll-animation"
 import { SideSection } from "@/components/landing/side-section"
 import { SponsorsSection } from "@/components/landing/sponsors-section"
 import { HeroSection } from "@/components/landing/hero-section"
+import { HeroMobile } from "@/components/landing/hero-mobile"
 
 export default async function HomePage() {
   const supabase = await createClient()
@@ -100,19 +101,31 @@ export default async function HomePage() {
       <Navbar />
       <main>
 
-        <SideSection />
+        <div className="hidden md:block">
+          <SideSection />
+        </div>
 
-        <ScrollAnimation>
-          <VideoSection />
-        </ScrollAnimation>
 
-        <ScrollAnimation>
-          <HeroSection
-            votingStartDate={startDate}
-            votingEndDate={endDate}
-            showCountdown={showHeroCountdown}
-          />
-        </ScrollAnimation>
+
+        <div className="block md:hidden">
+          <HeroMobile />
+        </div>
+
+        <div className="hidden md:block">
+          <ScrollAnimation>
+            <HeroSection
+              votingStartDate={startDate}
+              votingEndDate={endDate}
+              showCountdown={showHeroCountdown}
+            />
+          </ScrollAnimation>
+        </div>
+
+        <div className="hidden md:block">
+          <ScrollAnimation>
+            <VideoSection />
+          </ScrollAnimation>
+        </div>
 
         <ScrollAnimation>
           <TopNomineesSection nominees={nomineesWithData} userVotes={userVotes} userId={user?.id} votingStatus={votingStatus} />

@@ -12,6 +12,7 @@ const geistMono = Geist_Mono({ subsets: ["latin"] })
 const avantique = localFont({
   src: "../public/fonts/Avantique-Regular.ttf",
   variable: "--font-avantique",
+  display: "swap",
 })
 
 export const metadata: Metadata = {

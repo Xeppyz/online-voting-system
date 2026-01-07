@@ -52,7 +52,7 @@ export function TopNomineesSection({ nominees, userVotes, userId, votingStatus =
   useEffect(() => {
     const interval = setInterval(() => {
       setRotationSeed((prev) => prev + 1)
-    }, 10000) // 10 segundos
+    }, 15000) // 15 segundos
     return () => clearInterval(interval)
   }, [])
 
@@ -82,13 +82,22 @@ export function TopNomineesSection({ nominees, userVotes, userId, votingStatus =
       })
 
       // Filter & Shuffle Nominees
-      let selected = [...categoryNominees]
-      if (selected.length > 2) {
-        // Solo mezclar en el cliente para evitar errores de hidratación
-        if (isMounted) {
-          selected.sort(() => Math.random() - 0.5)
-        }
-        selected = selected.slice(0, 2)
+      let selected: typeof categoryNominees = []
+      const total = categoryNominees.length
+
+      if (total <= 2) {
+        selected = categoryNominees
+      } else {
+        // Deterministic rotation based on seed
+        // We show 2 items per rotation.
+        const startIndex = (rotationSeed * 2) % total
+
+        // Get first item
+        selected.push(categoryNominees[startIndex])
+
+        // Get second item (wrap around if needed)
+        const nextIndex = (startIndex + 1) % total
+        selected.push(categoryNominees[nextIndex])
       }
 
       selected.forEach((nominee) => {
@@ -225,12 +234,8 @@ export function TopNomineesSection({ nominees, userVotes, userId, votingStatus =
       const hasVote = userVotes?.[nominee.category_id] === nominee.id
       return (
         <div key={`${item.type}-${nominee.id}`} className="h-full w-full">
-          <motion.div
+          <div
             className="h-full transform hover:-translate-y-1 transition-transform duration-300"
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.5 }}
           >
             <NomineeCard
               nominee={nominee}
@@ -242,8 +247,9 @@ export function TopNomineesSection({ nominees, userVotes, userId, votingStatus =
               showCategoryInfo={false}
               compact={true}
               votingStatus={votingStatus}
+              priority={true} // Force eager load for carousel
             />
-          </motion.div>
+          </div>
         </div>
       )
     }
