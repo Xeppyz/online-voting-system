@@ -1,51 +1,53 @@
-
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Vote, Trophy, Users } from "lucide-react"
-import { createClient } from "@/lib/supabase/server"
+import { Vote } from "lucide-react"
 import localFont from "next/font/local"
-
-const sentient = localFont({
-    src: "../../public/fonts/Sentient-VariableItalic.ttf",
-})
+import { CountdownTimer } from "@/components/ui/countdown-timer"
 
 const avantiqueBold = localFont({
     src: "../../public/fonts/Avantique-Bold.otf",
 })
 
-export async function HeroSection() {
-    const supabase = await createClient()
+interface HeroSectionProps {
+    votingStartDate?: string | null
+    votingEndDate?: string | null
+}
 
-    // Fetch real counts from database
-    const [categoriesResult, nomineesResult, votesResult] = await Promise.all([
-        supabase.from("categories").select("id", { count: "exact", head: true }),
-        supabase.from("nominees").select("id", { count: "exact", head: true }),
-        supabase.from("votes").select("id", { count: "exact", head: true }),
-    ])
+export function HeroSection({ votingStartDate, votingEndDate }: HeroSectionProps) {
+    const now = new Date()
+    const startDate = votingStartDate ? new Date(votingStartDate) : null
+    const endDate = votingEndDate ? new Date(votingEndDate) : null
 
-    const categoriesCount = categoriesResult.count ?? 0
-    const nomineesCount = nomineesResult.count ?? 0
-    const votesCount = votesResult.count ?? 0
+    let timerTarget: string | null = null
+    let timerTitle = ""
+    let showVoteButton = true
+    let isVotingEnded = false
+
+    if (startDate && startDate > now) {
+        timerTarget = startDate.toISOString()
+        timerTitle = "La votación inicia en"
+        showVoteButton = false
+    } else if (endDate && endDate > now) {
+        timerTarget = endDate.toISOString()
+        timerTitle = "La votación termina en"
+        showVoteButton = true
+    } else if (endDate && endDate <= now) {
+        isVotingEnded = true
+        showVoteButton = false
+    }
 
     return (
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
-            {/* Background Elements */}
-            {/* Background Elements - Removed to allow page background to show */}
-            {/* <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-background to-[#00D4FF]/5" /> */}
-
-            {/* Grid Pattern - Removed */}
-            {/* <div className="absolute inset-0 opacity-[0.02]" ... /> */}
-
             <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
                 <div className="space-y-8">
                     {/* Badge */}
                     <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary mt-24 md:mt-0">
-                        <span className="text-sm font-medium uppercase tracking-wide font-sans">Primer Edición de los Clikaward Enero 2026 - Managua - Nicaragua</span>
+                        <span className="text-sm font-medium uppercase tracking-wide font-sans">Primer Edición de los Clik Award Enero 2026 - Managua - Nicaragua</span>
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-center mt-8">
                         {/* Left Image Block */}
-                        <div className="block md:col-span-3 order-1 md:order-1">
+                        <div className="hidden md:block md:col-span-3 order-1 md:order-1">
                             <div className="relative w-full aspect-[3/4] max-w-[200px] md:max-w-full mx-auto rounded-2xl overflow-hidden shadow-2xl shadow-primary/10 transform rotate-[-6deg] hover:rotate-0 transition-transform duration-500">
                                 <img src="/side/side1.png" alt="Clikawards Highlights" className="object-cover w-full h-full" />
                             </div>
@@ -53,15 +55,30 @@ export async function HeroSection() {
 
                         {/* Main Content */}
                         <div className="col-span-1 md:col-span-6 space-y-8 order-2 md:order-2">
-                            {/* Main Title */}
                             {/* Main Title - Replaced with Logo */}
                             <div className="flex justify-center">
                                 <img
                                     src="/icon/ClikV01.png"
                                     alt="Clik Awards Logo"
-                                    className="w-full max-w-[400px] h-auto object-contain"
+                                    className="w-full max-w-[250px] md:max-w-[400px] h-auto object-contain"
                                 />
                             </div>
+
+                            {/* Countdown Timer */}
+                            {timerTarget && (
+                                <div className="py-4">
+                                    <CountdownTimer targetDate={timerTarget} title={timerTitle} />
+                                </div>
+                            )}
+
+                            {isVotingEnded && (
+                                <div className="py-4">
+                                    <h3 className="text-3xl font-bold uppercase tracking-widest text-[#3ffcff]">
+                                        Votación Finalizada
+                                    </h3>
+                                    <p className="text-muted-foreground mt-2">Gracias por participar.</p>
+                                </div>
+                            )}
 
                             {/* Subtitle */}
                             <p className="text-xl sm:text-2xl text-muted-foreground max-w-2xl mx-auto text-pretty font-sans">
@@ -70,19 +87,26 @@ export async function HeroSection() {
 
                             {/* CTA Buttons */}
                             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-                                <Link href="/categorias">
+                                {showVoteButton ? (
+                                    <Link href="/categorias">
+                                        <Button
+                                            size="lg"
+                                            className={`text-lg px-8 py-6 rounded-xl bg-[#3ffcff] text-primary-foreground shadow-lg shadow-[#3ffcff]/25 hover:shadow-xl hover:shadow-[#3ffcff]/30 transition-all hover:bg-[#3ffcff]/90 ${avantiqueBold.className}`}
+                                        >
+                                            <Vote className="w-5 h-5 mr-2" />
+                                            Iniciar Votación
+                                        </Button>
+                                    </Link>
+                                ) : (
                                     <Button
                                         size="lg"
-                                        className={`text-lg px-8 py-6 rounded-xl bg-[#3ffcff] text-primary-foreground shadow-lg shadow-[#3ffcff]/25 hover:shadow-xl hover:shadow-[#3ffcff]/30 transition-all hover:bg-[#3ffcff]/90 ${avantiqueBold.className}`}
+                                        disabled
+                                        className={`text-lg px-8 py-6 rounded-xl bg-muted text-muted-foreground opacity-50 cursor-not-allowed ${avantiqueBold.className}`}
                                     >
                                         <Vote className="w-5 h-5 mr-2" />
-                                        Iniciar Votación
+                                        {isVotingEnded ? "Votación Cerrada" : "Próximamente"}
                                     </Button>
-                                </Link>
-                                {/* Stats button hidden/removed for user as requested, or keep strictly? 
-                    User said: "quitaremos las estadistica de la vista del usuario normal, soolo estara para el admin tambien quitaremos el contador de votos"
-                    So I will remove the "Ver Estadísticas" button as well to clean up the user view.
-                */}
+                                )}
                             </div>
                         </div>
 
@@ -95,23 +119,6 @@ export async function HeroSection() {
                     </div>
                 </div>
             </div>
-
-            {/* Scroll Indicator */}
-            {/* Removed scroll indicator */}
-            {/* <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 1 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2"
-      >
-        <div className="w-6 h-10 rounded-full border-2 border-muted-foreground/30 flex justify-center">
-          <motion.div
-            animate={{ y: [0, 12, 0] }}
-            transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
-            className="w-1.5 h-1.5 rounded-full bg-primary mt-2"
-          />
-        </div>
-      </motion.div> */}
         </section>
     )
 }

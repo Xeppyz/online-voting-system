@@ -6,6 +6,7 @@ import { ArrowRight } from "lucide-react"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import Link from "next/link"
 import { useEffect, useRef, useState, useMemo } from "react"
+import { motion, AnimatePresence } from "framer-motion"
 
 interface TopNomineesSectionProps {
   nominees: (NomineeWithVotes & {
@@ -16,6 +17,7 @@ interface TopNomineesSectionProps {
   })[]
   userVotes: Record<string, string>
   userId?: string
+  votingStatus?: "active" | "upcoming" | "ended"
 }
 
 type ColumnItem =
@@ -36,7 +38,7 @@ const blockColors: Record<string, string> = {
   pink: "#e87bff",
 }
 
-export function TopNomineesSection({ nominees, userVotes, userId }: TopNomineesSectionProps) {
+export function TopNomineesSection({ nominees, userVotes, userId, votingStatus = "active" }: TopNomineesSectionProps) {
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [isPaused, setIsPaused] = useState(false)
   const [rotationSeed, setRotationSeed] = useState(0)
@@ -46,11 +48,11 @@ export function TopNomineesSection({ nominees, userVotes, userId }: TopNomineesS
     setIsMounted(true)
   }, [])
 
-  // Rotación aleatoria cada minuto
+  // Rotación aleatoria cada 10 segundos
   useEffect(() => {
     const interval = setInterval(() => {
       setRotationSeed((prev) => prev + 1)
-    }, 60000) // 1 minuto
+    }, 10000) // 10 segundos
     return () => clearInterval(interval)
   }, [])
 
@@ -81,12 +83,12 @@ export function TopNomineesSection({ nominees, userVotes, userId }: TopNomineesS
 
       // Filter & Shuffle Nominees
       let selected = [...categoryNominees]
-      if (selected.length > 4) {
+      if (selected.length > 2) {
         // Solo mezclar en el cliente para evitar errores de hidratación
         if (isMounted) {
           selected.sort(() => Math.random() - 0.5)
         }
-        selected = selected.slice(0, 4)
+        selected = selected.slice(0, 2)
       }
 
       selected.forEach((nominee) => {
@@ -135,7 +137,7 @@ export function TopNomineesSection({ nominees, userVotes, userId }: TopNomineesS
     if (!scrollContainer || !shouldAnimate) return
 
     let animationFrameId: number
-    const speed = 0.5 // Velocidad del auto-scroll
+    const speed = 1.5 // Velocidad aumentada (antes 0.5)
 
     const step = () => {
       // Importante: Calculamos el límite de reinicio (la mitad del contenido total)
@@ -224,7 +226,13 @@ export function TopNomineesSection({ nominees, userVotes, userId }: TopNomineesS
       const hasVote = userVotes?.[nominee.category_id] === nominee.id
       return (
         <div key={`${item.type}-${nominee.id}`} className="h-full w-full">
-          <div className="h-full transform hover:-translate-y-1 transition-transform duration-300">
+          <motion.div
+            className="h-full transform hover:-translate-y-1 transition-transform duration-300"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95 }}
+            transition={{ duration: 0.5 }}
+          >
             <NomineeCard
               nominee={nominee}
               categoryId={nominee.category_id}
@@ -234,8 +242,9 @@ export function TopNomineesSection({ nominees, userVotes, userId }: TopNomineesS
               categoryName={nominee.category_name}
               showCategoryInfo={false}
               compact={true}
+              votingStatus={votingStatus}
             />
-          </div>
+          </motion.div>
         </div>
       )
     }
@@ -248,9 +257,7 @@ export function TopNomineesSection({ nominees, userVotes, userId }: TopNomineesS
           <h2 className="text-3xl font-bold tracking-widest text-foreground sm:text-4xl text-center">
             Nominados Destacados
           </h2>
-          <p className="mt-4 text-muted-foreground">
-            Descubre a los candidatos en cada categoría
-          </p>
+
         </div>
 
         <div

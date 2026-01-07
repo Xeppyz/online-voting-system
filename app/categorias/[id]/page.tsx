@@ -87,6 +87,23 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   const themeColor = activeGroup ? activeGroup.color : "#4771ff" // Default Blue fallback
 
+  // Fetch app settings for voting dates (Logic replicated for consistency)
+  const { data: settings } = await supabase
+    .from("app_settings")
+    .select("key, value")
+    .in("key", ["voting_start_date", "voting_end_date"])
+
+  const startDate = settings?.find((s) => s.key === "voting_start_date")?.value || null
+  const endDate = settings?.find((s) => s.key === "voting_end_date")?.value || null
+
+  const now = new Date()
+  const start = startDate ? new Date(startDate) : null
+  const end = endDate ? new Date(endDate) : null
+
+  let votingStatus: "active" | "upcoming" | "ended" = "active"
+  if (start && start > now) votingStatus = "upcoming"
+  if (end && end <= now) votingStatus = "ended"
+
   return (
     <div className="min-h-screen bg-black text-white selection:bg-white/20">
       <Navbar />
@@ -114,7 +131,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-4">
                 <Trophy className="w-4 h-4" style={{ color: themeColor }} />
                 <span className="text-xs font-bold uppercase tracking-wider" style={{ color: themeColor }}>
-                  Clikawards 2026
+                  Clik Awards 2026
                 </span>
               </div>
 
@@ -155,6 +172,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
           userVote={userVote}
           userId={user?.id}
           themeColor={themeColor}
+          votingStatus={votingStatus}
         />
       </main>
     </div>

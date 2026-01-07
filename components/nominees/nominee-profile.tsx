@@ -23,9 +23,10 @@ interface NomineeProfileProps {
   isVoted: boolean
   hasVotedInCategory: boolean
   userId?: string
+  votingStatus?: "active" | "upcoming" | "ended"
 }
 
-export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory, userId }: NomineeProfileProps) {
+export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory, userId, votingStatus = "active" }: NomineeProfileProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [showLoginDialog, setShowLoginDialog] = useState(false)
   const [showVideo, setShowVideo] = useState(false)
@@ -41,10 +42,18 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
   const effectiveIsVoted = isVoted || localIsVoted || anonVotedNominee
   const effectiveHasVotedInCategory = hasVotedInCategory || localIsVoted || anonHasVotedCat
 
+  const isVotingDisabled = votingStatus !== "active"
+
   // Determine if we are still checking (only if not logged in)
   const isCheckingAuth = !userId && anonLoading
 
   const handleVote = async () => {
+    if (isVotingDisabled) {
+      if (votingStatus === "upcoming") toast.info("La votación aún no ha comenzado")
+      if (votingStatus === "ended") toast.info("La votación ha finalizado")
+      return
+    }
+
     // 1. Check if user is logged in
     if (!userId) {
       // 2. If not logged in, check if anonymous voting is enabled
@@ -344,11 +353,13 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
                     <Button
                       onClick={handleVote}
                       size="lg"
-                      disabled={isLoading || (effectiveHasVotedInCategory && !voted) || isCheckingAuth}
+                      disabled={isLoading || (effectiveHasVotedInCategory && !voted) || isCheckingAuth || isVotingDisabled}
                       className="w-full sm:w-auto h-16 text-xl px-12 rounded-2xl bg-primary text-primary-foreground hover:opacity-90 shadow-lg shadow-primary/20 transition-transform active:scale-95"
                     >
                       <img src="/icon/ISOTIPOCLIK512PX.png" alt="Votar" className="w-6 h-6 mr-3 object-contain" />
-                      {isLoading ? "Registrando..." : "Votar"}
+                      {isLoading ? "Registrando..." : isVotingDisabled ? (
+                        votingStatus === "upcoming" ? "Próximamente" : "Finalizado"
+                      ) : "Votar"}
                     </Button>
 
                     {(effectiveHasVotedInCategory && !voted) && (

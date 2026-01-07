@@ -25,6 +25,7 @@ interface NomineeCardProps {
   showCategoryInfo?: boolean
   compact?: boolean
   variant?: "social" | "voting"
+  votingStatus?: "active" | "upcoming" | "ended"
 }
 
 export function NomineeCard({
@@ -36,7 +37,8 @@ export function NomineeCard({
   categoryName,
   showCategoryInfo = true,
   compact = false,
-  variant = "social"
+  variant = "social",
+  votingStatus = "active"
 }: NomineeCardProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [showLoginDialog, setShowLoginDialog] = useState(false)
@@ -48,12 +50,19 @@ export function NomineeCard({
 
   const effectiveIsVoted = isVoted || localIsVoted || anonVotedNominee
   const effectiveHasVoted = hasVoted || localIsVoted || anonHasVotedCat || anonVotedNominee
+  const isVotingDisabled = votingStatus !== "active"
 
   const router = useRouter()
 
   const handleVote = async (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
+
+    if (isVotingDisabled) {
+      if (votingStatus === "upcoming") toast.info("La votación aún no ha comenzado")
+      if (votingStatus === "ended") toast.info("La votación ha finalizado")
+      return
+    }
 
     if (!userId) {
       const supabase = createClient()
@@ -243,7 +252,7 @@ export function NomineeCard({
 
                 <Button
                   onClick={handleVote}
-                  disabled={effectiveHasVoted || isLoading || (anonLoading && !userId)}
+                  disabled={effectiveHasVoted || isLoading || (anonLoading && !userId) || isVotingDisabled}
                   size="sm"
                   className={`w-full ${voted ? "bg-primary/20 text-primary hover:bg-primary/30 border border-primary/20" : "bg-primary text-primary-foreground shadow-lg shadow-primary/20"}`}
                   variant={voted ? "outline" : "default"}
@@ -257,6 +266,8 @@ export function NomineeCard({
                     </>
                   ) : effectiveHasVoted ? (
                     "Ya votaste"
+                  ) : isVotingDisabled ? (
+                    votingStatus === "upcoming" ? "Próximamente" : "Finalizado"
                   ) : (
                     <>
                       <Vote className="w-4 h-4 mr-2" />

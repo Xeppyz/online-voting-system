@@ -9,7 +9,7 @@ export function SideSection() {
                 <div className="relative w-full aspect-[16/9] md:aspect-[21/9] overflow-hidden rounded-3xl">
                     <Image
                         src="/side/side3.png"
-                        alt="Clikawards Banner"
+                        alt="Clik Awards Banner"
                         fill
                         className="object-contain"
                     />

@@ -24,17 +24,35 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+import { CurtainGuard } from "@/components/layout/curtain-guard"
+import { createClient } from "@/lib/supabase/server"
+import { Toaster } from "sonner"
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode
 }>) {
+
+  // Check initial curtain state server-side to prevent flash
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from("app_settings")
+    .select("value")
+    .eq("key", "enable_website_curtain")
+    .single()
+
+  const isCurtainEnabled = data?.value === true
+
   return (
     <html lang="es" className="dark">
       <body className={`font-sans antialiased ${avantique.variable}`} suppressHydrationWarning>
-        {children}
+        <CurtainGuard initialEnabled={isCurtainEnabled}>
+          {children}
+        </CurtainGuard>
         <AnalyticsTracker /> {/* [NEW] Real custom analytics */}
         <Analytics /> {/* Vercel analytics (optional, keep if user wants both) */}
+        <Toaster theme="dark" position="bottom-right" />
       </body>
     </html>
   )

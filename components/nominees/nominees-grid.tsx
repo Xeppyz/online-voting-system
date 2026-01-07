@@ -11,9 +11,10 @@ interface NomineesGridProps {
   userVote: string | null
   userId?: string
   themeColor: string
+  votingStatus?: "active" | "upcoming" | "ended"
 }
 
-export function NomineesGrid({ nominees, categoryId, userVote, userId, themeColor }: NomineesGridProps) {
+export function NomineesGrid({ nominees, categoryId, userVote, userId, themeColor, votingStatus = "active" }: NomineesGridProps) {
   if (nominees.length === 0) {
     return (
       <div className="text-center py-16">
@@ -54,6 +55,7 @@ export function NomineesGrid({ nominees, categoryId, userVote, userId, themeColo
               hasVoted={!!userVote}
               userId={userId}
               variant="voting"
+              votingStatus={votingStatus}
             />
           </motion.div>
         ))}

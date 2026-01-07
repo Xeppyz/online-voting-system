@@ -74,16 +74,33 @@ export default async function HomePage() {
     })
   }
 
+  // Fetch app settings for voting dates
+  const { data: settings } = await supabase
+    .from("app_settings")
+    .select("key, value")
+    .in("key", ["voting_start_date", "voting_end_date"])
+
+  const startDate = settings?.find((s) => s.key === "voting_start_date")?.value || null
+  const endDate = settings?.find((s) => s.key === "voting_end_date")?.value || null
+
+  const now = new Date()
+  const start = startDate ? new Date(startDate) : null
+  const end = endDate ? new Date(endDate) : null
+
+  let votingStatus: "active" | "upcoming" | "ended" = "active"
+  if (start && start > now) votingStatus = "upcoming"
+  if (end && end <= now) votingStatus = "ended"
+
   return (
     <div className="min-h-screen bg-background bg-clik-16x9 bg-cover bg-center bg-fixed">
       <Navbar />
       <main>
         <ScrollAnimation>
-          <HeroSection />
+          <HeroSection votingStartDate={startDate} votingEndDate={endDate} />
         </ScrollAnimation>
 
         <ScrollAnimation>
-          <TopNomineesSection nominees={nomineesWithData} userVotes={userVotes} userId={user?.id} />
+          <TopNomineesSection nominees={nomineesWithData} userVotes={userVotes} userId={user?.id} votingStatus={votingStatus} />
         </ScrollAnimation>
 
         <SideSection />
