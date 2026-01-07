@@ -69,9 +69,9 @@ export function CurtainGuard({ children, initialEnabled = false, startDate }: Cu
 
             setEnabled(shouldEnable)
 
-            // 2. Check User Session
+            // 2. Check User Session & Authorization (Admin only bypass)
             const { data: { user } } = await supabase.auth.getUser()
-            if (user) {
+            if (user && user.user_metadata?.is_admin === true) {
                 setIsAuthorized(true)
             }
 
@@ -99,7 +99,8 @@ export function CurtainGuard({ children, initialEnabled = false, startDate }: Cu
 
         // Listen for auth changes to update state immediately upon login/logout
         const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-            setIsAuthorized(!!session?.user)
+            const isAdmin = session?.user?.user_metadata?.is_admin === true
+            setIsAuthorized(isAdmin)
         })
 
         return () => {

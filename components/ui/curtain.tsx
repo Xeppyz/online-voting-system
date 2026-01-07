@@ -1,12 +1,15 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Bell } from "lucide-react"
+import { Bell, Check, UserPlus, Mail } from "lucide-react"
 import { motion } from "framer-motion"
 import { useEffect, useState } from "react"
 import localFont from "next/font/local"
 import { createClient } from "@/lib/supabase/client"
 import { useRouter } from "next/navigation"
+import type { User } from "@supabase/supabase-js"
+import { sendWelcomeEmail } from "@/lib/email-actions"
+import { toast } from "sonner"
 
 const avantiqueBold = localFont({
     src: "../../public/fonts/Avantique-Bold.otf",
@@ -18,46 +21,63 @@ interface CurtainProps {
 
 export function Curtain({ startDate: propStartDate }: CurtainProps) {
     const router = useRouter()
-
-    // Helper to calculate time left
-    const calculateTimeLeft = (targetDate: Date) => {
-        const now = new Date()
-        const diff = targetDate.getTime() - now.getTime()
-
-        if (diff <= 0) {
-            return { days: "00", hours: "00", minutes: "00", seconds: "00" }
-        }
-
-        const days = Math.floor(diff / (1000 * 60 * 60 * 24))
-        const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
-        const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
-        const seconds = Math.floor((diff % (1000 * 60)) / 1000)
-
-        return {
-            days: days.toString().padStart(2, "0"),
-            hours: hours.toString().padStart(2, "0"),
-            minutes: minutes.toString().padStart(2, "0"),
-            seconds: seconds.toString().padStart(2, "0"),
-        }
-    }
-
+    const [user, setUser] = useState<User | null>(null)
     const [timeLeft, setTimeLeft] = useState(() => {
+        // Helper to determine initial state helper
         if (propStartDate) {
             const start = new Date(propStartDate)
             if (!isNaN(start.getTime())) {
-                return calculateTimeLeft(start)
+                const now = new Date()
+                const diff = start.getTime() - now.getTime()
+                if (diff > 0) {
+                    const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+                    const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+                    const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+                    const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+                    return {
+                        days: days.toString().padStart(2, "0"),
+                        hours: hours.toString().padStart(2, "0"),
+                        minutes: minutes.toString().padStart(2, "0"),
+                        seconds: seconds.toString().padStart(2, "0"),
+                    }
+                }
             }
         }
         return {
-            days: "00",
-            hours: "00",
-            minutes: "00",
-            seconds: "00",
+            days: "00", hours: "00", minutes: "00", seconds: "00"
         }
     })
 
     useEffect(() => {
+        const supabase = createClient()
+
+        // Check current user
+        supabase.auth.getUser().then(({ data: { user } }) => {
+            setUser(user)
+        })
+
         let timer: NodeJS.Timeout
+
+        const calculateTimeLeft = (targetDate: Date) => {
+            const now = new Date()
+            const diff = targetDate.getTime() - now.getTime()
+
+            if (diff <= 0) {
+                return { days: "00", hours: "00", minutes: "00", seconds: "00" }
+            }
+
+            const days = Math.floor(diff / (1000 * 60 * 60 * 24))
+            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+            const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60))
+            const seconds = Math.floor((diff % (1000 * 60)) / 1000)
+
+            return {
+                days: days.toString().padStart(2, "0"),
+                hours: hours.toString().padStart(2, "0"),
+                minutes: minutes.toString().padStart(2, "0"),
+                seconds: seconds.toString().padStart(2, "0"),
+            }
+        }
 
         const startTimer = (startDate: Date) => {
             timer = setInterval(() => {
@@ -86,7 +106,6 @@ export function Curtain({ startDate: propStartDate }: CurtainProps) {
         } else {
             // Fallback: fetch date if not provided via props
             const fetchDates = async () => {
-                const supabase = createClient()
                 const { data } = await supabase.from("app_settings").select("value").eq("key", "voting_start_date").single()
 
                 if (data?.value) {
@@ -159,19 +178,23 @@ export function Curtain({ startDate: propStartDate }: CurtainProps) {
                     <TimeBlock value={timeLeft.seconds} label="Seg" isCyan />
                 </motion.div>
 
-                {/* Notify Button */}
+                {/* Notify/Register Button */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8 }}
                 >
-                    <Button
-                        className={`bg-[#3ffcff] hover:bg-[#3ffcff]/90 text-black text-lg h-14 px-8 rounded-none min-w-[240px] ${avantiqueBold.className}`}
-                        onClick={() => window.open('https://instagram.com/clikawards_nic', '_blank')}
-                    >
-                        <Bell className="w-5 h-5 mr-3 fill-black" />
-                        Notificarme
-                    </Button>
+                    {user ? (
+                        <UserWelcomeBlock user={user} />
+                    ) : (
+                        <Button
+                            className={`bg-[#3ffcff] hover:bg-[#3ffcff]/90 text-black text-lg h-14 px-8 rounded-none min-w-[240px] ${avantiqueBold.className}`}
+                            onClick={() => router.push('/auth/login')}
+                        >
+                            <UserPlus className="w-5 h-5 mr-3 fill-black stroke-black" />
+                            Pre-Registrarme
+                        </Button>
+                    )}
                 </motion.div>
             </div>
         </div>
@@ -190,6 +213,69 @@ function TimeBlock({ value, label, isCyan = false }: { value: string, label: str
             <span className={`text-[10px] sm:text-xs font-bold uppercase tracking-widest ${isCyan ? 'text-[#3ffcff]' : 'text-[#3ffcff]'}`}>
                 {label}
             </span>
+        </div>
+    )
+}
+
+function UserWelcomeBlock({ user }: { user: User }) {
+    const [sending, setSending] = useState(false)
+    const [sent, setSent] = useState(false)
+
+    const handleSendEmail = async () => {
+        if (!user.email) return
+        setSending(true)
+        try {
+            const res = await sendWelcomeEmail(user.email)
+            if (res.success) {
+                setSent(true)
+                toast.success("¡Correo enviado! Revisa tu bandeja de entrada.")
+            } else {
+                toast.error("Error al enviar el correo. Inténtalo más tarde.")
+            }
+        } catch (err) {
+            toast.error("Ocurrió un error inesperado.")
+        } finally {
+            setSending(false)
+        }
+    }
+
+    return (
+        <div className="flex flex-col items-center gap-3">
+            <div className="flex items-center gap-2 mb-2">
+                <div className="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-xs font-medium border border-green-500/20 flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                    Registro Confirmado
+                </div>
+            </div>
+
+            {!sent ? (
+                <Button
+                    onClick={handleSendEmail}
+                    disabled={sending}
+                    className={`bg-white hover:bg-gray-200 text-black text-lg h-14 px-8 rounded-none min-w-[240px] transition-all ${avantiqueBold.className}`}
+                >
+                    {sending ? (
+                        <span className="flex items-center gap-2">Enviando...</span>
+                    ) : (
+                        <>
+                            <Mail className="w-5 h-5 mr-3" />
+                            Enviarme recordatorio
+                        </>
+                    )}
+                </Button>
+            ) : (
+                <Button
+                    disabled
+                    className={`bg-white/10 text-white/50 border border-white/10 text-lg h-14 px-8 rounded-none min-w-[240px] cursor-not-allowed ${avantiqueBold.className}`}
+                >
+                    <Check className="w-5 h-5 mr-3" />
+                    ¡Correo Enviado!
+                </Button>
+            )}
+
+            <p className="text-xs text-muted-foreground uppercase tracking-widest mt-2">
+                Te notificaremos cuando inicie la votación
+            </p>
         </div>
     )
 }
