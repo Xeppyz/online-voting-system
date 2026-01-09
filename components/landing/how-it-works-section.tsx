@@ -19,7 +19,7 @@ const steps = [
   {
     number: "04",
     title: "Celebra",
-    description: "Podría ser descarga tu imagen verificada de votación.",
+    description: "Descarga tu imagen verificada de votación.",
   }
 
 ]
