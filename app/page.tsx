@@ -1,6 +1,7 @@
 export const revalidate = 60 // Revalidate every minute for better performance
 
 import { createClient } from "@/lib/supabase/server"
+import { toNicaraguaTime } from "@/lib/utils"
 import { FeaturesSection } from "@/components/landing/features-section"
 import { HowItWorksSection } from "@/components/landing/how-it-works-section"
 import { Footer } from "@/components/landing/footer"
@@ -89,8 +90,8 @@ export default async function HomePage() {
   const showHeroCountdown = settings?.find((s) => s.key === "show_hero_countdown")?.value !== false
 
   const now = new Date()
-  const start = startDate ? new Date(startDate) : null
-  const end = endDate ? new Date(endDate) : null
+  const start = toNicaraguaTime(startDate)
+  const end = toNicaraguaTime(endDate)
 
   let votingStatus: "active" | "upcoming" | "ended" = "active"
   if (start && start > now) votingStatus = "upcoming"

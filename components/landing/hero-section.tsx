@@ -8,6 +8,7 @@ import localFont from "next/font/local"
 import { CountdownTimer } from "@/components/ui/countdown-timer"
 import { useState, useEffect } from "react"
 import { createClient } from "@/lib/supabase/client"
+import { toNicaraguaTime } from "@/lib/utils"
 
 const avantiqueBold = localFont({
     src: "../../public/fonts/Avantique-Bold.otf",
@@ -30,8 +31,8 @@ export function HeroSection({ votingStartDate, votingEndDate, showCountdown = tr
 
         const isValidDate = (d: any) => d instanceof Date && !isNaN(d.getTime())
 
-        let start = votingStartDate ? new Date(votingStartDate) : null
-        let end = votingEndDate ? new Date(votingEndDate) : null
+        let start = toNicaraguaTime(votingStartDate)
+        let end = toNicaraguaTime(votingEndDate)
 
         if (start && !isValidDate(start)) start = null
         if (end && !isValidDate(end)) end = null
