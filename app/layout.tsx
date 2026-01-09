@@ -66,7 +66,7 @@ export default async function RootLayout({
         <CurtainGuard initialEnabled={isCurtainEnabled} startDate={startDateVal}>
           {children}
         </CurtainGuard>
-        <AnalyticsTracker /> {/* [NEW] Real custom analytics */}
+        {/* AnalyticsTracker removed to save requests */}
         <Analytics /> {/* Vercel analytics (optional, keep if user wants both) */}
         <Toaster theme="dark" position="bottom-right" />
       </body>
