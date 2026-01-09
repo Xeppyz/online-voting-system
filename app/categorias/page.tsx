@@ -3,6 +3,8 @@ import { Navbar } from "@/components/landing/navbar"
 import Link from "next/link"
 import { ArrowRight } from "lucide-react"
 
+export const revalidate = 60 // Cache for 60 seconds
+
 export default async function CategoriesPage() {
   const supabase = await createClient()
 

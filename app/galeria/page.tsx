@@ -3,6 +3,8 @@ import { Navbar } from "@/components/landing/navbar"
 import Image from "next/image"
 import { Calendar } from "lucide-react"
 
+export const revalidate = 60 // Cache for 60 seconds
+
 export default async function GalleryPage() {
     const supabase = await createClient()
 
