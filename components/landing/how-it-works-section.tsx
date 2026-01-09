@@ -16,11 +16,7 @@ const steps = [
     title: "Elige tu Favorito",
     description: "Mira los perfiles, videos y vota por quien más te guste.",
   },
-  {
-    number: "04",
-    title: "Celebra",
-    description: "Observa los resultados en tiempo real y comparte con tus amigos.",
-  },
+
 ]
 
 export function HowItWorksSection() {
