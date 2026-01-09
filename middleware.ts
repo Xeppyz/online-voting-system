@@ -1,45 +1,41 @@
 import { NextRequest, NextResponse } from 'next/server'
 
 export function middleware(req: NextRequest) {
-    // Only run on Vercel (where req.geo is defined)
-    // Locally, req.geo is usually undefined, so we allow access for development.
-    const { geo } = req as NextRequest & { geo?: { country?: string } }
-    const country = geo?.country
+    // HEADER DE PROTECCIÓN DE VERCEL
+    // x-vercel-bot-label:
+    // '0' -> Humano (o muy parecido a humano)
+    // '1' -> Bot (Automatizado)
+    const botLabel = req.headers.get('x-vercel-bot-label')
 
-    // If we are in production (geo exists) and the country is NOT Nicaragua (NI)
-    if (country && country !== 'NI') {
-        // Allows access to static files so they don't break if we ever show a custom error page
-        if (
-            req.nextUrl.pathname.startsWith('/_next') ||
-            req.nextUrl.pathname.startsWith('/static') ||
-            req.nextUrl.pathname.startsWith('/api/webhooks') // Allow webhooks if needed (e.g. Stripe/Resend)
-        ) {
-            return NextResponse.next()
-        }
+    // Si Vercel dice que es un BOT (1)
+    if (botLabel === '1') {
+        // Lista blanca de bots "buenos" (Buscadores)
+        // Vercel ya verifica si es Google/Bing real, pero aquí podemos filtrar extra si queremos.
+        // Por ahora, si es un bot y estamos bajo ataque, podríamos bloquear todo menos lo vital.
 
-        // Block the request
-        return new NextResponse(
-            `<html>
-        <head><title>Access Denied</title></head>
-        <body style="display:flex;justify-content:center;align-items:center;height:100vh;background:#000;color:#fff;font-family:sans-serif;text-align:center;">
-          <div>
-            <h1 style="color:#e11d48;">Acceso Restringido</h1>
-            <p>Por seguridad, el acceso a este sitio está limitado temporalmente para tu región (${country}).</p>
-            <p>Si eres de Nicaragua y ves esto, por favor intenta usar datos móviles.</p>
-          </div>
-        </body>
-      </html>`,
-            { status: 403, headers: { 'content-type': 'text/html' } }
-        )
+        // OJO: Si tienes el modo "Attack Challenge" activado en Vercel, el bloqueo sucede ANTES de llegar aquí.
+        // Si llega aquí, es porque Vercel lo dejó pasar (quizás en modo "Log").
+
+        // ESTRATEGIA: Bloquear bots si no parecen buscadores legítimos.
+        // Simplificación: Bloquear todo tráfico marcado como '1' si no es ruta estática.
+        // (A menos que quieras SEO, en cuyo caso habría que hilar más fino, pero para parar el ataque 1.2M...)
+
+        // Vamos a permitir el paso por ahora, pero prepárate para descomentar el bloqueo si el ataque sigue.
+        // Si quieres bloquear YA:
+        // return new NextResponse('Bot detection', { status: 403 })
     }
+
+    // IMPORTANTE:
+    // La protección real de "BotID" (ese paquete npm) funciona inyectando un script en el cliente.
+    // El middleware solo ve el resultado.
+
+    // Como pediste instalar 'botid', lo dejamos listo.
+    // Pero la defensa PRINCIPAL contra los 1.2M de requests es configurar en el Dashboard de Vercel:
+    // Security -> Bot Protection -> Action: "Challenge" o "Deny".
 
     return NextResponse.next()
 }
 
 export const config = {
-    matcher: [
-        // Apply to all routes except api/webhooks if needed, static files, etc.
-        // The middleware function logic explicitly handles _next/static, but we can also exclude here for perf
-        '/((?!_next/static|_next/image|favicon.ico).*)',
-    ],
+    matcher: '/:path*',
 }
