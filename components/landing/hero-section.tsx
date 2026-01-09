@@ -110,16 +110,12 @@ export function HeroSection({ votingStartDate, votingEndDate, showCountdown = tr
                     {/* MOBILE HERO LAYOUT */}
                     <div className="block md:hidden w-full space-y-6 mt-4">
                         <div className="relative w-full aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl border border-white/10 mx-auto max-w-[400px]">
-                            <video
-                                className="absolute inset-0 w-full h-full object-cover"
-                                autoPlay
-                                muted
-                                loop
-                                playsInline
-                                poster="/placeholder.svg"
-                            >
-                                <source src={heroVideoUrl || "/clikaward.mp4"} type="video/mp4" />
-                            </video>
+                            <iframe
+                                className="absolute inset-0 w-full h-full object-cover pointer-events-none scale-[1.35]" // Scaled up to hide black bars if needed
+                                src="https://www.youtube.com/embed/VpeY91r9RFQ?autoplay=1&mute=1&loop=1&playlist=VpeY91r9RFQ&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1"
+                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                style={{ pointerEvents: 'none' }}
+                            />
 
                             <div className="absolute inset-0 bg-black/40 z-10" />
 

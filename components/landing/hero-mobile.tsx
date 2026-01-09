@@ -70,16 +70,14 @@ export function HeroMobile({ heroVideoUrl }: HeroMobileProps) {
             {/* 3. Video Section */}
             <div className="relative w-full aspect-video md:aspect-auto">
                 <div className="w-full h-full overflow-hidden">
-                    <video
-                        className="w-full h-full object-cover"
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        poster="/placeholder.svg"
-                    >
-                        <source src={heroVideoUrl || "/clikaward.mp4"} type="video/mp4" />
-                    </video>
+                    <iframe
+                        className="w-full h-full object-cover pointer-events-none"
+                        src="https://www.youtube.com/embed/VpeY91r9RFQ?autoplay=1&mute=1&loop=1&playlist=VpeY91r9RFQ&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        onError={(e) => console.error("Video load error", e)}
+                        allowFullScreen
+                        style={{ pointerEvents: 'none' }} // Prevent interaction to keep it background-like
+                    />
                 </div>
             </div>
         </section>

@@ -17,18 +17,32 @@ import { HeroMobile } from "@/components/landing/hero-mobile"
 export default async function HomePage() {
   const supabase = await createClient()
 
-  // Fetch all votes to calculate statistics
-  const { data: votes } = await supabase.from("votes").select("category_id, nominee_id")
+  // Fetch all votes to calculate statistics using RPC to bypass 1000 row limit
+  const { data: votes, error: votesError } = await supabase.rpc("get_vote_counts")
+
+  if (votesError) {
+    console.error("Error fetching vote counts via RPC:", votesError)
+  } else {
+    console.log("RPC returned rows:", votes?.length)
+    if (votes && votes.length > 0) {
+      console.log("First row sample:", votes[0])
+    }
+  }
 
   // Process votes to find top nominee per category
   const categoryVotes: Record<string, Record<string, number>> = {} // categoryId -> { nomineeId -> count }
   const categoryTotalVotes: Record<string, number> = {} // categoryId -> total
 
-  votes?.forEach((vote) => {
-    if (!categoryVotes[vote.category_id]) categoryVotes[vote.category_id] = {}
-    categoryVotes[vote.category_id][vote.nominee_id] = (categoryVotes[vote.category_id][vote.nominee_id] || 0) + 1
-    categoryTotalVotes[vote.category_id] = (categoryTotalVotes[vote.category_id] || 0) + 1
-  })
+  if (votes) {
+    votes.forEach((vote: any) => {
+      const count = Number(vote.vote_count)
+      if (!categoryVotes[vote.category_id]) categoryVotes[vote.category_id] = {}
+      categoryVotes[vote.category_id][vote.nominee_id] = count
+
+      // Sum up total votes for the category
+      categoryTotalVotes[vote.category_id] = (categoryTotalVotes[vote.category_id] || 0) + count
+    })
+  }
 
   // Fetch all nominees with their categories
   const { data: allNominees } = await supabase
@@ -82,11 +96,10 @@ export default async function HomePage() {
   const { data: settings } = await supabase
     .from("app_settings")
     .select("key, value")
-    .in("key", ["voting_start_date", "voting_end_date", "show_hero_countdown", "hero_video_url"])
+    .in("key", ["voting_start_date", "voting_end_date", "show_hero_countdown"])
 
   const startDate = settings?.find((s) => s.key === "voting_start_date")?.value || null
   const endDate = settings?.find((s) => s.key === "voting_end_date")?.value || null
-  const heroVideoUrl = settings?.find((s) => s.key === "hero_video_url")?.value || "https://ciuvwumhmxdskmtkijru.supabase.co/storage/v1/object/public/gallery/1767950742099-g2urr8.mp4"
   // Default to true if setting doesn't exist to maintain backward compatibility
   const showHeroCountdown = settings?.find((s) => s.key === "show_hero_countdown")?.value !== false
 
@@ -110,7 +123,7 @@ export default async function HomePage() {
 
 
         <div className="block md:hidden">
-          <HeroMobile heroVideoUrl={heroVideoUrl} />
+          <HeroMobile />
         </div>
 
         <div className="hidden md:block">
@@ -119,7 +132,6 @@ export default async function HomePage() {
               votingStartDate={startDate}
               votingEndDate={endDate}
               showCountdown={showHeroCountdown}
-              heroVideoUrl={heroVideoUrl}
             />
           </ScrollAnimation>
         </div>
