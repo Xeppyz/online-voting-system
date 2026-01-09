@@ -7,6 +7,7 @@ import { Vote } from "lucide-react"
 import localFont from "next/font/local"
 import { CountdownTimer } from "@/components/ui/countdown-timer"
 import { useState, useEffect } from "react"
+import { createClient } from "@/lib/supabase/client"
 
 const avantiqueBold = localFont({
     src: "../../public/fonts/Avantique-Bold.otf",
@@ -41,30 +42,58 @@ export function HeroSection({ votingStartDate, votingEndDate, showCountdown = tr
         setIsVotingEnded(false);
         setShowVoteButton(false);
 
-        console.log("Voting Dates:", { start, end, now }) // Debugging
+        const checkAdminStatus = async () => {
+            const supabase = createClient()
+            const { data: { user } } = await supabase.auth.getUser()
+            console.log("HeroSection: Checking user", user?.id)
 
-        if (end && now > end) {
-            setIsVotingEnded(true)
-            setShowVoteButton(false)
-            setTimerTarget(null)
-            return
-        }
+            if (user) {
+                const { data: profile, error } = await supabase
+                    .from('profiles')
+                    .select('role')
+                    .eq('id', user.id)
+                    .single()
 
-        if (start && now < start && showCountdown) {
-            setTimerTarget(start)
-            setTimerTitle("La votación inicia en:")
-            setShowVoteButton(false)
-        } else if (end && showCountdown) {
-            setTimerTarget(end)
-            setTimerTitle("La votación termina en:")
-            setShowVoteButton(true)
-        } else {
-            // If manual toggle is off, we still want to show the button if active
-            if (start && now >= start && (!end || now <= end)) {
-                setShowVoteButton(true)
+                console.log("HeroSection: Profile check", { profile, error })
+
+                if (profile?.role === 'admin') {
+                    console.log("HeroSection: User is admin, enabling button")
+                    setShowVoteButton(true)
+                    setIsVotingEnded(false)
+                    setTimerTarget(null) // No timer for admins if they can already vote
+                    return
+                }
             }
-            setTimerTarget(null)
+
+            if (end && now > end) {
+                setIsVotingEnded(true)
+                setShowVoteButton(false)
+                setTimerTarget(null)
+                return
+            }
+
+            // Always show vote button if not passed end date
+            setShowVoteButton(true)
+
+            if (start && now < start && showCountdown) {
+                setTimerTarget(start)
+                setTimerTitle("La votación inicia en:")
+                setShowVoteButton(false)
+            } else if (end && showCountdown) {
+                setTimerTarget(end)
+                setTimerTitle("La votación termina en:")
+                setShowVoteButton(true)
+            } else {
+                // If manual toggle is off, we still want to show the button if active
+                if (start && now >= start && (!end || now <= end)) {
+                    setShowVoteButton(true)
+                }
+                setTimerTarget(null)
+            }
         }
+
+        checkAdminStatus()
+
     }, [votingStartDate, votingEndDate, showCountdown])
 
     return (
@@ -73,7 +102,7 @@ export function HeroSection({ votingStartDate, votingEndDate, showCountdown = tr
                 <div className="space-y-6">
                     {/* Badge */}
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary">
-                        <span className="text-[10px] md:text-xs font-medium uppercase tracking-wide font-sans">Primer Edición de los Clik Award Enero 2026 - Managua - Nicaragua</span>
+                        <span className="text-[10px] md:text-xs font-medium uppercase tracking-wide font-sans">El primer reconocimiento a los creadores de contenido en Nicaragua</span>
                     </div>
 
                     {/* MOBILE HERO LAYOUT */}
@@ -105,7 +134,7 @@ export function HeroSection({ votingStartDate, votingEndDate, showCountdown = tr
                                         >
                                             <div className="relative w-6 h-6 mr-3">
                                                 <Image
-                                                    src="/icon/ISOTIPOCLIK512PX.png"
+                                                    src="/icon/CHECKICON-8.png"
                                                     alt="Icon"
                                                     fill
                                                     className="object-contain"
@@ -185,7 +214,14 @@ export function HeroSection({ votingStartDate, votingEndDate, showCountdown = tr
                                             size="lg"
                                             className={`text-sm md:text-lg px-6 py-4 md:px-8 md:py-6 h-auto rounded-xl bg-[#3ffcff] text-primary-foreground shadow-lg shadow-[#3ffcff]/25 hover:shadow-xl hover:shadow-[#3ffcff]/30 transition-all hover:bg-[#3ffcff]/90 ${avantiqueBold.className}`}
                                         >
-                                            <Vote className="w-4 h-4 md:w-5 md:h-5 mr-2" />
+                                            <div className="relative w-6 h-6 mr-3">
+                                                <Image
+                                                    src="/icon/CHECKICON-8.png"
+                                                    alt="Icon"
+                                                    fill
+                                                    className="object-contain"
+                                                />
+                                            </div>
                                             Iniciar Votación
                                         </Button>
                                     </Link>

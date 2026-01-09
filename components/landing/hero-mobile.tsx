@@ -23,10 +23,10 @@ export function HeroMobile() {
                     priority
                 />
                 <div className="absolute inset-0 bg-black/40" />
-                <div className="absolute inset-0 flex items-start justify-center pt-37">
-                    <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary backdrop-blur-sm">
-                        <span className="text-[10px] font-medium uppercase tracking-wide font-sans">
-                            Primera Edición Clik Awards 2026
+                <div className="absolute inset-0 flex items-end justify-center pb-6">
+                    <div className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 text-primary backdrop-blur-md max-w-[90%] shadow-sm">
+                        <span className="text-[10px] font-medium uppercase tracking-wide font-sans text-center leading-normal">
+                            El primer reconocimiento a los creadores de contenido en Nicaragua
                         </span>
                     </div>
                 </div>
@@ -51,7 +51,7 @@ export function HeroMobile() {
                         >
                             <div className="relative w-5 h-5 mr-3">
                                 <Image
-                                    src="/icon/ISOTIPOCLIK512PX.png"
+                                    src="/icon/CHECKICON-8.png"
                                     alt="Icon"
                                     fill
                                     className="object-contain"

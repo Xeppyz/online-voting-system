@@ -24,7 +24,7 @@ export default async function GalleryPage() {
                         </span>
                     </h1>
                     <p className="text-xl text-white/60 max-w-2xl mx-auto font-light">
-                        Los mejores momentos de los Clik Awards
+                        Multimedia de los CLik Awards
                     </p>
                 </div>
 

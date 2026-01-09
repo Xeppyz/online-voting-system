@@ -47,13 +47,14 @@ export function NomineeCard({
   const [showLoginDialog, setShowLoginDialog] = useState(false)
   const [localIsVoted, setLocalIsVoted] = useState(isVoted)
   const [isManualFlipped, setIsManualFlipped] = useState(false)
+  // ... existing hooks ...
 
   // ... existing hook calls ...
   const { hasVotedInCategory: anonHasVotedCat, votedForNominee: anonVotedNominee, loading: anonLoading } = useAnonymousVoteStatus(categoryId, nominee.id, userId)
 
   const effectiveIsVoted = isVoted || localIsVoted || anonVotedNominee
   const effectiveHasVoted = hasVoted || localIsVoted || anonHasVotedCat || anonVotedNominee
-  const isVotingDisabled = votingStatus !== "active"
+  const isVotingDisabled = votingStatus === "ended"
 
   const router = useRouter()
 
@@ -64,7 +65,6 @@ export function NomineeCard({
     e.stopPropagation()
 
     if (isVotingDisabled) {
-      if (votingStatus === "upcoming") toast.info("La votación aún no ha comenzado")
       if (votingStatus === "ended") toast.info("La votación ha finalizado")
       return
     }
@@ -274,10 +274,17 @@ export function NomineeCard({
                   ) : effectiveHasVoted ? (
                     "Ya votaste"
                   ) : isVotingDisabled ? (
-                    votingStatus === "upcoming" ? "Próximamente" : "Finalizado"
+                    "Finalizado"
                   ) : (
                     <>
-                      <Vote className="w-4 h-4 mr-2" />
+                      <div className="relative w-4 h-4 mr-2">
+                        <Image
+                          src="/icon/CHECKICON-8.png"
+                          alt="Vote"
+                          fill
+                          className="object-contain"
+                        />
+                      </div>
                       Votar
                     </>
                   )}

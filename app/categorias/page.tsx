@@ -82,7 +82,7 @@ export default async function CategoriesPage() {
             Categorías
           </h1>
           <p className="text-xl text-white/60 max-w-2xl mx-auto font-light">
-            Explora y vota por el talento nicaragüense
+            Explorá las diferentes categorías y votá por tu creador de contenido favorito.
           </p>
         </div>
 

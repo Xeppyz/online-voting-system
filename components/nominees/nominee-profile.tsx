@@ -42,14 +42,13 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
   const effectiveIsVoted = isVoted || localIsVoted || anonVotedNominee
   const effectiveHasVotedInCategory = hasVotedInCategory || localIsVoted || anonHasVotedCat
 
-  const isVotingDisabled = votingStatus !== "active"
+  const isVotingDisabled = votingStatus === "ended"
 
   // Determine if we are still checking (only if not logged in)
   const isCheckingAuth = !userId && anonLoading
 
   const handleVote = async () => {
     if (isVotingDisabled) {
-      if (votingStatus === "upcoming") toast.info("La votación aún no ha comenzado")
       if (votingStatus === "ended") toast.info("La votación ha finalizado")
       return
     }
@@ -356,9 +355,9 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
                       disabled={isLoading || (effectiveHasVotedInCategory && !voted) || isCheckingAuth || isVotingDisabled}
                       className="w-full sm:w-auto h-16 text-xl px-12 rounded-2xl bg-primary text-primary-foreground hover:opacity-90 shadow-lg shadow-primary/20 transition-transform active:scale-95"
                     >
-                      <img src="/icon/ISOTIPOCLIK512PX.png" alt="Votar" className="w-6 h-6 mr-3 object-contain" />
+                      <img src="/icon/CHECKICON-8.png" alt="Votar" className="w-6 h-6 mr-3 object-contain" />
                       {isLoading ? "Registrando..." : isVotingDisabled ? (
-                        votingStatus === "upcoming" ? "Próximamente" : "Finalizado"
+                        "Finalizado"
                       ) : "Votar"}
                     </Button>
 
