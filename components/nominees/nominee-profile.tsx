@@ -166,41 +166,40 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
       const dataUrl = canvas.toDataURL("image/png")
       const blob = await (await fetch(dataUrl)).blob()
 
+      // ALWAYS download the image first
+      const link = document.createElement("a")
+      link.href = dataUrl
+      link.download = `voto-${nominee.name.replace(/\s+/g, "-")}.png`
+      document.body.appendChild(link)
+      link.click()
+      document.body.removeChild(link)
+
+      // Notify user
+      toast.success("Imagen descargada", {
+        description: "La imagen se ha guardado en tu dispositivo."
+      })
+
+      // Then try to native share if available
       if (navigator.share) {
         try {
           const file = new File([blob], `voto-${nominee.id}.png`, { type: "image/png" })
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
             await navigator.share({
               files: [file],
-              // title: `Mi voto por ${nominee.name}`,
-              // text: `He votado por ${nominee.name} en los Clik Awards. ¡Vota tú también! @clikawards_nic`
             })
           } else {
-            // Fallback for devices supporting share but not files
+            // Fallback share without files
             await navigator.share({
               title: `Mi voto por ${nominee.name}`,
               url: window.location.href
             })
           }
         } catch (err) {
-          console.warn("Share failed or cancelled", err)
-          // Fallback to manual download if share interaction failed (and wasn't just cancelled)
+          // Ignore abort errors (user cancelled share)
           if ((err as Error).name !== 'AbortError') {
-            const link = document.createElement("a")
-            link.href = dataUrl
-            link.download = `voto-${nominee.name.replace(/\s+/g, "-")}.png`
-            link.click()
+            console.warn("Share failed", err)
           }
         }
-      } else {
-        // Desktop fallback
-        const link = document.createElement("a")
-        link.href = dataUrl
-        link.download = `voto-${nominee.name.replace(/\s+/g, "-")}.png`
-        link.click()
-        toast.success("Imagen guardada", {
-          description: "La imagen se ha descargado. ¡Ahora puedes subirla a tus redes!"
-        })
       }
     } catch (err) {
       console.error("Error generating share image", err)
