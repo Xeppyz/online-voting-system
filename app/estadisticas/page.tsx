@@ -11,27 +11,24 @@ export default async function StatsPage() {
   // Get all nominees
   const { data: nominees } = await supabase.from("nominees").select("*")
 
-  // Get all votes
-  const { data: votes } = await supabase.from("votes").select("*")
+  // Get scalable stats
+  const { data: voteCounts } = await supabase.rpc("get_vote_counts")
+  const { data: adminStats } = await supabase.rpc("get_admin_stats")
 
-  // Process data for stats
-  const nomineeVotes =
-    votes?.reduce(
-      (acc, vote) => {
-        acc[vote.nominee_id] = (acc[vote.nominee_id] || 0) + 1
-        return acc
-      },
-      {} as Record<string, number>,
-    ) || {}
+  const totalGlobalVotes = Number(adminStats?.[0]?.total_votes || 0)
 
-  const categoryVotes =
-    votes?.reduce(
-      (acc, vote) => {
-        acc[vote.category_id] = (acc[vote.category_id] || 0) + 1
-        return acc
-      },
-      {} as Record<string, number>,
-    ) || {}
+  // Process data for stats from RPC
+  const nomineeVotes: Record<string, number> = {}
+  const categoryVotes: Record<string, number> = {}
+
+  if (voteCounts) {
+    voteCounts.forEach((vc: any) => {
+      const count = Number(vc.vote_count)
+      // Check if IDs exist to avoid undefined keys
+      if (vc.nominee_id) nomineeVotes[vc.nominee_id] = count
+      if (vc.category_id) categoryVotes[vc.category_id] = (categoryVotes[vc.category_id] || 0) + count
+    })
+  }
 
   const categoriesWithStats =
     categories?.map((category) => {
@@ -68,7 +65,7 @@ export default async function StatsPage() {
           </p>
         </div>
 
-        <AdvancedStats initialCategories={categoriesWithStats} totalVotes={votes?.length || 0} />
+        <AdvancedStats initialCategories={categoriesWithStats} totalVotes={totalGlobalVotes} />
       </main>
     </div>
   )

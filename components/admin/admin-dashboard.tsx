@@ -27,6 +27,7 @@ interface AdminDashboardProps {
   uniqueVoters: number
   activityData: { date: string, count: number }[]
   preloadedImages: string[]
+  categoryVotes?: Record<string, number> // New prop for scalable stats
 }
 
 export function AdminDashboard({
@@ -38,7 +39,8 @@ export function AdminDashboard({
   votes = [],
   uniqueVoters,
   activityData,
-  preloadedImages
+  preloadedImages,
+  categoryVotes = {},
 }: AdminDashboardProps) {
   const [categories, setCategories] = useState(initialCategories)
   const [nominees, setNominees] = useState(initialNominees)
@@ -90,11 +92,12 @@ export function AdminDashboard({
           <TabsContent value="overview">
             <AdminOverview
               categories={categories}
-              nominees={nominees}
+              nominees={initialNominees}
               totalVotes={totalVotes}
               votes={votes}
               uniqueVoters={uniqueVoters}
               activityData={activityData}
+              categoryVotes={categoryVotes}
             />
           </TabsContent>
 

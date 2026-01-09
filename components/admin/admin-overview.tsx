@@ -25,6 +25,7 @@ interface AdminOverviewProps {
   votes?: any[]
   uniqueVoters: number
   activityData: { date: string, count: number }[]
+  categoryVotes?: Record<string, number>
 }
 
 export function AdminOverview({
@@ -33,12 +34,17 @@ export function AdminOverview({
   totalVotes,
   votes = [],
   uniqueVoters,
-  activityData
+  activityData,
+  categoryVotes = {},
 }: AdminOverviewProps) {
 
   // 1. Prepare Data for "Votes by Category" Bar Chart
   const votesByCategory = categories.map(cat => {
-    const catVotes = votes.filter(v => v.category_id === cat.id).length
+    // Use pre-calculated aggregated votes if available, otherwise fall back to raw count (legacy)
+    const catVotes = categoryVotes[cat.id] !== undefined
+      ? categoryVotes[cat.id]
+      : votes.filter(v => v.category_id === cat.id).length
+
     return {
       name: cat.name,
       votos: catVotes
