@@ -16,8 +16,8 @@ const avantique = localFont({
 })
 
 export const metadata: Metadata = {
-  title: "Clic Awards 2026",
-  description: "Vota por tus favoritos en los Clic Awards 2026",
+  title: "Clik Awards 2026",
+  description: "Vota por tus favoritos en los Clik Awards 2026",
   icons: {
     icon: "/icon/ISOTIPOCLIK512PX.png",
     shortcut: "/icon/ISOTIPOCLIK512PX.png",
