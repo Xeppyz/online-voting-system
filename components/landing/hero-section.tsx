@@ -18,9 +18,10 @@ interface HeroSectionProps {
     votingStartDate?: string | null
     votingEndDate?: string | null
     showCountdown?: boolean
+    heroVideoUrl?: string | null
 }
 
-export function HeroSection({ votingStartDate, votingEndDate, showCountdown = true }: HeroSectionProps) {
+export function HeroSection({ votingStartDate, votingEndDate, showCountdown = true, heroVideoUrl }: HeroSectionProps) {
     const [timerTarget, setTimerTarget] = useState<Date | null>(null)
     const [timerTitle, setTimerTitle] = useState("")
     const [isVotingEnded, setIsVotingEnded] = useState(false)
@@ -117,7 +118,7 @@ export function HeroSection({ votingStartDate, votingEndDate, showCountdown = tr
                                 playsInline
                                 poster="/placeholder.svg"
                             >
-                                <source src="/clikaward.mp4" type="video/mp4" />
+                                <source src={heroVideoUrl || "/clikaward.mp4"} type="video/mp4" />
                             </video>
 
                             <div className="absolute inset-0 bg-black/40 z-10" />

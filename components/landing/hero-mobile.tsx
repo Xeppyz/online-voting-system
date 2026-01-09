@@ -10,7 +10,11 @@ const avantiqueBold = localFont({
     src: "../../public/fonts/Avantique-Bold.otf",
 })
 
-export function HeroMobile() {
+interface HeroMobileProps {
+    heroVideoUrl?: string | null
+}
+
+export function HeroMobile({ heroVideoUrl }: HeroMobileProps) {
     return (
         <section className="relative w-full overflow-hidden bg-background pb-12">
             {/* 1. Header Image with Overlay */}
@@ -74,7 +78,7 @@ export function HeroMobile() {
                         playsInline
                         poster="/placeholder.svg"
                     >
-                        <source src="/clikaward.mp4" type="video/mp4" />
+                        <source src={heroVideoUrl || "/clikaward.mp4"} type="video/mp4" />
                     </video>
                 </div>
             </div>

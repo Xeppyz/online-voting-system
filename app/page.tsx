@@ -82,10 +82,11 @@ export default async function HomePage() {
   const { data: settings } = await supabase
     .from("app_settings")
     .select("key, value")
-    .in("key", ["voting_start_date", "voting_end_date", "show_hero_countdown"])
+    .in("key", ["voting_start_date", "voting_end_date", "show_hero_countdown", "hero_video_url"])
 
   const startDate = settings?.find((s) => s.key === "voting_start_date")?.value || null
   const endDate = settings?.find((s) => s.key === "voting_end_date")?.value || null
+  const heroVideoUrl = settings?.find((s) => s.key === "hero_video_url")?.value || "https://ciuvwumhmxdskmtkijru.supabase.co/storage/v1/object/public/gallery/1767950742099-g2urr8.mp4"
   // Default to true if setting doesn't exist to maintain backward compatibility
   const showHeroCountdown = settings?.find((s) => s.key === "show_hero_countdown")?.value !== false
 
@@ -109,7 +110,7 @@ export default async function HomePage() {
 
 
         <div className="block md:hidden">
-          <HeroMobile />
+          <HeroMobile heroVideoUrl={heroVideoUrl} />
         </div>
 
         <div className="hidden md:block">
@@ -118,6 +119,7 @@ export default async function HomePage() {
               votingStartDate={startDate}
               votingEndDate={endDate}
               showCountdown={showHeroCountdown}
+              heroVideoUrl={heroVideoUrl}
             />
           </ScrollAnimation>
         </div>
