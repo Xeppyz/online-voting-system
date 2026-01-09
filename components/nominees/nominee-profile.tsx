@@ -165,42 +165,50 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
 
       const dataUrl = canvas.toDataURL("image/png")
       const blob = await (await fetch(dataUrl)).blob()
+      const objectUrl = URL.createObjectURL(blob)
 
       // ALWAYS download the image first
+      // We use a timeout to separate the download action from the share action
+      // because triggering both synchronously often fails on mobile.
       const link = document.createElement("a")
-      link.href = dataUrl
+      link.href = objectUrl
       link.download = `voto-${nominee.name.replace(/\s+/g, "-")}.png`
       document.body.appendChild(link)
       link.click()
       document.body.removeChild(link)
 
       // Notify user
-      toast.success("Imagen descargada", {
-        description: "La imagen se ha guardado en tu dispositivo."
+      toast.success("Descargando imagen...", {
+        description: "Si no inicia, usa la opción de Compartir."
       })
 
-      // Then try to native share if available
-      if (navigator.share) {
-        try {
-          const file = new File([blob], `voto-${nominee.id}.png`, { type: "image/png" })
-          if (navigator.canShare && navigator.canShare({ files: [file] })) {
-            await navigator.share({
-              files: [file],
-            })
-          } else {
-            // Fallback share without files
-            await navigator.share({
-              title: `Mi voto por ${nominee.name}`,
-              url: window.location.href
-            })
-          }
-        } catch (err) {
-          // Ignore abort errors (user cancelled share)
-          if ((err as Error).name !== 'AbortError') {
-            console.warn("Share failed", err)
+      // Wait a bit before opening share sheet to allow download to start
+      setTimeout(async () => {
+        if (navigator.share) {
+          try {
+            const file = new File([blob], `voto-${nominee.id}.png`, { type: "image/png" })
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+              await navigator.share({
+                files: [file],
+              })
+            } else {
+              // Fallback share without files
+              await navigator.share({
+                title: `Mi voto por ${nominee.name}`,
+                url: window.location.href
+              })
+            }
+          } catch (err) {
+            // Ignore abort errors (user cancelled share)
+            if ((err as Error).name !== 'AbortError') {
+              console.warn("Share failed", err)
+            }
           }
         }
-      }
+
+        // Cleanup
+        setTimeout(() => URL.revokeObjectURL(objectUrl), 5000)
+      }, 1000)
     } catch (err) {
       console.error("Error generating share image", err)
     } finally {
