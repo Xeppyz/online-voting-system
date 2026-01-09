@@ -21,7 +21,7 @@ export default async function HomePage() {
   const { data: votes, error: votesError } = await supabase.rpc("get_vote_counts")
 
   if (votesError) {
-    console.error("Error fetching vote counts via RPC:", votesError)
+    console.error("Error fetching vote counts via RPC:", JSON.stringify(votesError, null, 2))
   } else {
     console.log("RPC returned rows:", votes?.length)
     if (votes && votes.length > 0) {

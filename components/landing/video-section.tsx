@@ -22,18 +22,15 @@ export function VideoSection() {
                     </p>
                 </div>
 
-                <div className="relative aspect-video w-full max-w-5xl mx-auto rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-gray-900">
-                    <video
-                        className="w-full h-full object-cover"
-                        autoPlay
-                        muted
-                        loop
-                        playsInline
-                        poster="/placeholder.svg"
-                    >
-                        <source src="/clikaward.mp4" type="video/mp4" />
-                        Tu navegador no soporta el elemento de video.
-                    </video>
+                <div className="relative aspect-video w-full mx-auto rounded-2xl overflow-hidden shadow-2xl border border-white/10 bg-gray-900">
+                    <iframe
+                        className="w-full h-full object-cover scale-[1.35]"
+                        src="https://www.youtube.com/embed/VpeY91r9RFQ?autoplay=1&mute=1&loop=1&playlist=VpeY91r9RFQ&controls=0&showinfo=0&rel=0&modestbranding=1&iv_load_policy=3"
+                        title="Clik Awards Highlight"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        style={{ pointerEvents: "none" }}
+                    />
                 </div>
             </div>
         </section>

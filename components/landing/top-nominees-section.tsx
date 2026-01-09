@@ -133,7 +133,7 @@ export function TopNomineesSection({ nominees, userVotes, userId, votingStatus =
     return cols
   }, [nominees, rotationSeed, isMounted])
 
-  if (nominees.length === 0) return null
+  // if (nominees.length === 0) return null // REMOVED: Violates Rules of Hooks (useEffect below)
 
   // --- 2. DUPLICACIÓN CONDICIONAL ---
   // Solo duplicamos y animamos si hay suficientes elementos para que valga la pena (ej: 4 columnas o más)
@@ -254,6 +254,8 @@ export function TopNomineesSection({ nominees, userVotes, userId, votingStatus =
       )
     }
   }
+
+  if (nominees.length === 0) return null
 
   return (
     <section className="py-8 md:py-12">
