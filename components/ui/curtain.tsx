@@ -174,17 +174,7 @@ export function Curtain({ startDate: propStartDate }: CurtainProps) {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.8 }}
                 >
-                    {user ? (
-                        <UserWelcomeBlock user={user} />
-                    ) : (
-                        <Button
-                            className={`bg-[#3ffcff] hover:bg-[#3ffcff]/90 text-black text-lg h-14 px-8 rounded-none min-w-[240px] ${avantiqueBold.className}`}
-                            onClick={() => router.push('/auth/login')}
-                        >
-                            <UserPlus className="w-5 h-5 mr-3 fill-black stroke-black" />
-                            Pre-Registrarme
-                        </Button>
-                    )}
+
                 </motion.div>
             </div>
         </div>

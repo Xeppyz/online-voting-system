@@ -14,6 +14,7 @@ import confetti from "canvas-confetti"
 import { useAnonymousVoteStatus } from "@/hooks/use-anonymous-vote-status"
 import FingerprintJS from "@fingerprintjs/fingerprintjs"
 import { toast } from "sonner"
+import { useUserVotes } from "@/components/context/user-votes-provider"
 
 interface NomineeCardProps {
   nominee: NomineeWithVotes
@@ -50,10 +51,14 @@ export function NomineeCard({
   // ... existing hooks ...
 
   // ... existing hook calls ...
+  // ... existing hooks ...
   const { hasVotedInCategory: anonHasVotedCat, votedForNominee: anonVotedNominee, loading: anonLoading } = useAnonymousVoteStatus(categoryId, nominee.id, userId)
 
+  const { refreshVotes, userVotes, addVoteLocally } = useUserVotes()
+  const contextHasVoted = !!userVotes[categoryId]
+
   const effectiveIsVoted = isVoted || localIsVoted || anonVotedNominee
-  const effectiveHasVoted = hasVoted || localIsVoted || anonHasVotedCat || anonVotedNominee
+  const effectiveHasVoted = hasVoted || localIsVoted || anonHasVotedCat || anonVotedNominee || contextHasVoted
   const isVotingDisabled = votingStatus === "ended"
 
   const router = useRouter()
@@ -121,7 +126,10 @@ export function NomineeCard({
       return
     }
 
-    if (hasVoted) return
+    if (hasVoted || contextHasVoted) {
+      toast.info("Ya has votado en esta categoría")
+      return
+    }
 
     setIsLoading(true)
 
@@ -138,6 +146,9 @@ export function NomineeCard({
 
       setLocalIsVoted(true)
 
+      // Optimistic update: Update context immediately without fetching
+      addVoteLocally(categoryId, nominee.id)
+
       confetti({
         particleCount: 100,
         spread: 70,
@@ -146,9 +157,14 @@ export function NomineeCard({
       })
 
       router.refresh()
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error voting:", error)
-      toast.error("Error al votar")
+      if (error?.code === "23505") {
+        toast.error("Ya has votado en esta categoría")
+        await refreshVotes() // Sync state with server reality only on conflict
+      } else {
+        toast.error("Error al votar")
+      }
     } finally {
       setIsLoading(false)
     }

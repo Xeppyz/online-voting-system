@@ -1,4 +1,4 @@
-import { createClient } from "@/lib/supabase/server"
+import { createPublicClient } from "@/lib/supabase/public"
 import { notFound } from "next/navigation"
 import { NomineesGrid } from "@/components/nominees/nominees-grid"
 import { Navbar } from "@/components/landing/navbar"
@@ -14,7 +14,7 @@ interface CategoryPageProps {
 
 export default async function CategoryPage({ params }: CategoryPageProps) {
   const { id } = await params
-  const supabase = await createClient()
+  const supabase = createPublicClient()
 
   // Get category
   const { data: category } = await supabase.from("categories").select("*").eq("id", id).single()
@@ -47,22 +47,7 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
       percentage: totalVotes > 0 ? Math.round(((nomineeVotes[nominee.id] || 0) / totalVotes) * 100) : 0,
     })) || []
 
-  // Get current user's vote
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  let userVote: string | null = null
-  if (user) {
-    const { data: vote } = await supabase
-      .from("votes")
-      .select("nominee_id")
-      .eq("user_id", user.id)
-      .eq("category_id", id)
-      .single()
-
-    userVote = vote?.nominee_id || null
-  }
+  // --- User Auth Removed (Handled Client Side) ---
 
   // --- LOGICA DE TEMA DINÁMICO ---
   const groups = [
@@ -171,8 +156,6 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
         <NomineesGrid
           nominees={nomineesWithVotes}
           categoryId={id}
-          userVote={userVote}
-          userId={user?.id}
           themeColor={themeColor}
           votingStatus={votingStatus}
         />

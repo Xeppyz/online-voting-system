@@ -1,6 +1,6 @@
 export const revalidate = 60 // Revalidate every minute for better performance
 
-import { createClient } from "@/lib/supabase/server"
+import { createPublicClient } from "@/lib/supabase/public"
 import { toNicaraguaTime } from "@/lib/utils"
 import { FeaturesSection } from "@/components/landing/features-section"
 import { HowItWorksSection } from "@/components/landing/how-it-works-section"
@@ -15,7 +15,7 @@ import { HeroSection } from "@/components/landing/hero-section"
 import { HeroMobile } from "@/components/landing/hero-mobile"
 
 export default async function HomePage() {
-  const supabase = await createClient()
+  const supabase = createPublicClient()
 
   // Fetch all votes to calculate statistics using RPC to bypass 1000 row limit
   const { data: votes, error: votesError } = await supabase.rpc("get_vote_counts")
@@ -23,10 +23,7 @@ export default async function HomePage() {
   if (votesError) {
     console.error("Error fetching vote counts via RPC:", JSON.stringify(votesError, null, 2))
   } else {
-    console.log("RPC returned rows:", votes?.length)
-    if (votes && votes.length > 0) {
-      console.log("First row sample:", votes[0])
-    }
+    // console.log("RPC returned rows:", votes?.length)
   }
 
   // Process votes to find top nominee per category
@@ -74,23 +71,7 @@ export default async function HomePage() {
     })
   }
 
-  // Get current user's votes
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  const userVotes: Record<string, string> = {}
-
-  if (user) {
-    const { data: myVotes } = await supabase
-      .from("votes")
-      .select("category_id, nominee_id")
-      .eq("user_id", user.id)
-
-    myVotes?.forEach((vote) => {
-      userVotes[vote.category_id] = vote.nominee_id
-    })
-  }
+  // --- User Auth & Votes Logic Removed (Client Side handled by UserVotesProvider) ---
 
   // Fetch app settings for voting dates
   const { data: settings } = await supabase
@@ -143,7 +124,7 @@ export default async function HomePage() {
         </div>
 
         <ScrollAnimation>
-          <TopNomineesSection nominees={nomineesWithData} userVotes={userVotes} userId={user?.id} votingStatus={votingStatus} />
+          <TopNomineesSection nominees={nomineesWithData} votingStatus={votingStatus} />
         </ScrollAnimation>
 
 

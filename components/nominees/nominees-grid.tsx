@@ -8,13 +8,15 @@ import { Users } from "lucide-react"
 interface NomineesGridProps {
   nominees: NomineeWithVotes[]
   categoryId: string
-  userVote: string | null
-  userId?: string
   themeColor: string
   votingStatus?: "active" | "upcoming" | "ended"
 }
 
-export function NomineesGrid({ nominees, categoryId, userVote, userId, themeColor, votingStatus = "active" }: NomineesGridProps) {
+import { useUserVotes } from "@/components/context/user-votes-provider"
+
+export function NomineesGrid({ nominees, categoryId, themeColor, votingStatus = "active" }: NomineesGridProps) {
+  const { userVotes, userId } = useUserVotes()
+  const userVote = userVotes[categoryId] || null
   if (nominees.length === 0) {
     return (
       <div className="text-center py-16">
@@ -53,7 +55,7 @@ export function NomineesGrid({ nominees, categoryId, userVote, userId, themeColo
               categoryId={categoryId}
               isVoted={userVote === nominee.id}
               hasVoted={!!userVote}
-              userId={userId}
+              userId={userId ?? undefined}
               variant="voting"
               votingStatus={votingStatus}
             />

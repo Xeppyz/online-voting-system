@@ -15,8 +15,6 @@ interface TopNomineesSectionProps {
     category_image?: string | null
     category_block?: string | null // [NEW]
   })[]
-  userVotes: Record<string, string>
-  userId?: string
   votingStatus?: "active" | "upcoming" | "ended"
 }
 
@@ -38,7 +36,10 @@ const blockColors: Record<string, string> = {
   pink: "#e87bff",
 }
 
-export function TopNomineesSection({ nominees, userVotes, userId, votingStatus = "active" }: TopNomineesSectionProps) {
+import { useUserVotes } from "@/components/context/user-votes-provider"
+
+export function TopNomineesSection({ nominees, votingStatus = "active" }: TopNomineesSectionProps) {
+  const { userVotes, userId } = useUserVotes()
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const [isPaused, setIsPaused] = useState(false)
   const [rotationSeed, setRotationSeed] = useState(0)
@@ -242,7 +243,7 @@ export function TopNomineesSection({ nominees, userVotes, userId, votingStatus =
               categoryId={nominee.category_id}
               isVoted={hasVote}
               hasVoted={!!userVotes[nominee.category_id]}
-              userId={userId}
+              userId={userId ?? undefined}
               categoryName={nominee.category_name}
               showCategoryInfo={false}
               compact={true}

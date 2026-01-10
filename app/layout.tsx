@@ -29,8 +29,9 @@ export const metadata: Metadata = {
 }
 
 import { CurtainGuard } from "@/components/layout/curtain-guard"
-import { createClient } from "@/lib/supabase/server"
+import { createPublicClient } from "@/lib/supabase/public"
 import { Toaster } from "sonner"
+import { UserVotesProvider } from "@/components/context/user-votes-provider"
 
 export default async function RootLayout({
   children,
@@ -38,8 +39,8 @@ export default async function RootLayout({
   children: React.ReactNode
 }>) {
 
-  // Check initial curtain state server-side to prevent flash
-  const supabase = await createClient()
+  // Check initial curtain state using public client (no cookies/auth) to allow Static/ISR
+  const supabase = createPublicClient()
   const { data: settings } = await supabase
     .from("app_settings")
     .select("key, value")
@@ -50,11 +51,10 @@ export default async function RootLayout({
 
   let isCurtainEnabled = curtainEnabled
 
-  // If start date has passed, disable curtain automatically
+  // Simple server-side check (ISR will update this every revalidation period)
   if (isCurtainEnabled && startDateVal) {
     const start = new Date(startDateVal)
     const now = new Date()
-    // Add a small buffer or standard check
     if (!isNaN(start.getTime()) && now >= start) {
       isCurtainEnabled = false
     }
@@ -63,12 +63,14 @@ export default async function RootLayout({
   return (
     <html lang="es" className="dark notranslate" translate="no">
       <body className={`font-sans antialiased ${avantique.variable}`} suppressHydrationWarning>
-        <CurtainGuard initialEnabled={isCurtainEnabled} startDate={startDateVal}>
-          {children}
-        </CurtainGuard>
-        {/* AnalyticsTracker removed to save requests */}
-        <Analytics /> {/* Vercel analytics (optional, keep if user wants both) */}
-        <Toaster theme="dark" position="bottom-right" />
+        <UserVotesProvider>
+          <CurtainGuard initialEnabled={isCurtainEnabled} startDate={startDateVal}>
+            {children}
+          </CurtainGuard>
+          {/* AnalyticsTracker removed to save requests */}
+          <Analytics /> {/* Vercel analytics (optional, keep if user wants both) */}
+          <Toaster theme="dark" position="bottom-right" />
+        </UserVotesProvider>
       </body>
     </html>
   )
