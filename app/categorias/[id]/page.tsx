@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { ArrowLeft, Trophy } from "lucide-react"
 import Link from "next/link"
 
+export const revalidate = 60 // Cache for 60 seconds
+
 interface CategoryPageProps {
   params: Promise<{ id: string }>
 }

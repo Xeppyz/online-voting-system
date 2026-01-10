@@ -3,6 +3,8 @@ import { notFound } from "next/navigation"
 import { NomineeProfile } from "@/components/nominees/nominee-profile"
 import { Navbar } from "@/components/landing/navbar"
 
+export const revalidate = 60 // Cache for 60 seconds
+
 interface NomineePageProps {
   params: Promise<{ id: string }>
 }
