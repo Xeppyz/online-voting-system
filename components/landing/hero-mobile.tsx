@@ -71,7 +71,7 @@ export function HeroMobile({ heroVideoUrl }: HeroMobileProps) {
             <div className="relative w-full aspect-video md:aspect-auto">
                 <div className="w-full h-full overflow-hidden">
                     <iframe
-                        className="w-full h-full object-cover pointer-events-none scale-[1.35]"
+                        className="w-full h-full object-cover pointer-events-none scale-[1.80]"
                         src="https://www.youtube.com/embed/VpeY91r9RFQ?autoplay=1&mute=1&loop=1&playlist=VpeY91r9RFQ&controls=0&showinfo=0&rel=0&modestbranding=1&playsinline=1&enablejsapi=1"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen

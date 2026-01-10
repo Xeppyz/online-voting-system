@@ -149,17 +149,7 @@ export function Curtain({ startDate: propStartDate }: CurtainProps) {
                     transition={{ delay: 0.5 }}
                     className="text-xs sm:text-sm uppercase tracking-[0.3em] text-white font-medium mb-8"
                 >
-                    La votación inicia{" "}
-                    <span
-                        onClick={(e) => {
-                            e.stopPropagation()
-                            window.location.href = "/admin"
-                        }}
-                        className="cursor-default hover:text-white transition-colors relative z-50 px-1"
-                        title=""
-                    >
-                        en
-                    </span>
+                    EN MANTENIMIENTO
                 </motion.p>
 
                 {/* Countdown */}
