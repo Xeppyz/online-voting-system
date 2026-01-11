@@ -1,4 +1,5 @@
 import type React from "react"
+export const revalidate = 3600 // Revalidate every hour
 import type { Metadata } from "next"
 import { Inter, Geist_Mono } from "next/font/google"
 import localFont from "next/font/local"
