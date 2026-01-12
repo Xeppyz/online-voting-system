@@ -35,25 +35,7 @@ export default async function NomineePage({ params }: NomineePageProps) {
   const percentage =
     totalCategoryVotes && totalCategoryVotes > 0 ? Math.round(((voteCount || 0) / totalCategoryVotes) * 100) : 0
 
-  // Get current user's vote
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  let hasVotedInCategory = false
-  let isVoted = false
-
-  if (user) {
-    const { data: vote } = await supabase
-      .from("votes")
-      .select("nominee_id")
-      .eq("user_id", user.id)
-      .eq("category_id", nominee.category_id)
-      .single()
-
-    hasVotedInCategory = !!vote
-    isVoted = vote?.nominee_id === id
-  }
+  // --- User Auth Removed (Handled Client Side) ---
 
   // Fetch app settings for voting dates (Logic replicated for consistency)
   const { data: settings } = await supabase
@@ -83,9 +65,7 @@ export default async function NomineePage({ params }: NomineePageProps) {
             percentage,
           }}
           category={nominee.categories}
-          isVoted={isVoted}
-          hasVotedInCategory={hasVotedInCategory}
-          userId={user?.id}
+
           votingStatus={votingStatus}
         />
       </main>

@@ -12,6 +12,7 @@ import { motion } from "framer-motion"
 import html2canvas from "html2canvas"
 import FingerprintJS from "@fingerprintjs/fingerprintjs"
 import { useAnonymousVoteStatus } from "@/hooks/use-anonymous-vote-status"
+import { useUserVoteStatus } from "@/hooks/use-user-vote-status"
 
 import { createClient } from "@/lib/supabase/client"
 import confetti from "canvas-confetti"
@@ -20,32 +21,33 @@ import { toast } from "sonner"
 interface NomineeProfileProps {
   nominee: NomineeWithVotes
   category: Category
-  isVoted: boolean
-  hasVotedInCategory: boolean
-  userId?: string
+
   votingStatus?: "active" | "upcoming" | "ended"
 }
 
-export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory, userId, votingStatus = "active" }: NomineeProfileProps) {
+export function NomineeProfile({ nominee, category, votingStatus = "active" }: NomineeProfileProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [showLoginDialog, setShowLoginDialog] = useState(false)
   const [showVideo, setShowVideo] = useState(false)
-  const [localIsVoted, setLocalIsVoted] = useState(isVoted)
+  const [localIsVoted, setLocalIsVoted] = useState(false)
+
+  // Hook for user vote status (Client Side)
+  const { user, hasVotedInCategory: userHasVotedCat, votedForNominee: userVotedNominee, loading: userLoading } = useUserVoteStatus(category.id, nominee.id)
 
   // Hook for anonymous vote persistence
-  const { hasVotedInCategory: anonHasVotedCat, votedForNominee: anonVotedNominee, loading: anonLoading } = useAnonymousVoteStatus(category.id, nominee.id, userId)
+  const { hasVotedInCategory: anonHasVotedCat, votedForNominee: anonVotedNominee, loading: anonLoading } = useAnonymousVoteStatus(category.id, nominee.id, user?.id)
 
   const router = useRouter()
   const shareRef = useRef<HTMLDivElement>(null)
 
   // Merge server/local/anonymous states
-  const effectiveIsVoted = isVoted || localIsVoted || anonVotedNominee
-  const effectiveHasVotedInCategory = hasVotedInCategory || localIsVoted || anonHasVotedCat
+  const effectiveIsVoted = userVotedNominee || anonVotedNominee || localIsVoted
+  const effectiveHasVotedInCategory = userHasVotedCat || anonHasVotedCat || localIsVoted
 
   const isVotingDisabled = votingStatus === "ended"
 
-  // Determine if we are still checking (only if not logged in)
-  const isCheckingAuth = !userId && anonLoading
+  // Determine if we are still checking
+  const isCheckingAuth = userLoading || (anonLoading && !user)
 
   const handleVote = async () => {
     if (isVotingDisabled) {
@@ -54,7 +56,7 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
     }
 
     // 1. Check if user is logged in
-    if (!userId) {
+    if (!user) {
       // 2. If not logged in, check if anonymous voting is enabled
       const supabase = createClient()
       const { data: settings } = await supabase
@@ -123,7 +125,7 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
       const supabase = createClient()
 
       const { error } = await supabase.from("votes").insert({
-        user_id: userId,
+        user_id: user.id,
         nominee_id: nominee.id,
         category_id: category.id,
       })
@@ -388,7 +390,7 @@ export function NomineeProfile({ nominee, category, isVoted, hasVotedInCategory,
             </div>
 
 
-            {!userId && !effectiveHasVotedInCategory && !effectiveIsVoted && (
+            {!user && !effectiveHasVotedInCategory && !effectiveIsVoted && !isCheckingAuth && (
               <div className="p-4 rounded-xl bg-white/5 border border-white/10 text-center">
                 <p className="text-sm text-muted-foreground">
                   Para votar por este nominado, inicia sesión.
