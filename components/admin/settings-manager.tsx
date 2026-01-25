@@ -16,6 +16,7 @@ export function SettingsManager() {
     const [startDate, setStartDate] = useState("")
     const [endDate, setEndDate] = useState("")
     const [enableCurtain, setEnableCurtain] = useState(false)
+    const [disableVoting, setDisableVoting] = useState(false) // New manual disable
     const [showHeroCountdown, setShowHeroCountdown] = useState(true) // Default true
     const supabase = createClient()
 
@@ -28,7 +29,7 @@ export function SettingsManager() {
             const { data: settings } = await supabase
                 .from("app_settings")
                 .select("key, value")
-                .in("key", ["enable_anonymous_voting", "enable_website_curtain", "show_hero_countdown", "voting_start_date", "voting_end_date"])
+                .in("key", ["enable_anonymous_voting", "enable_website_curtain", "show_hero_countdown", "voting_start_date", "voting_end_date", "disable_voting"])
 
             if (settings) {
                 const anon = settings.find(s => s.key === "enable_anonymous_voting")
@@ -40,6 +41,9 @@ export function SettingsManager() {
                 const heroCountdown = settings.find(s => s.key === "show_hero_countdown")
                 // Default to true if not present, or use value if present
                 if (heroCountdown) setShowHeroCountdown(heroCountdown.value === true)
+
+                const disable = settings.find(s => s.key === "disable_voting")
+                if (disable) setDisableVoting(disable.value === true)
 
                 const start = settings.find(s => s.key === "voting_start_date")
                 const end = settings.find(s => s.key === "voting_end_date")
@@ -126,6 +130,30 @@ export function SettingsManager() {
         }
     }
 
+    const handleToggleDisableVoting = async (checked: boolean) => {
+        setUpdating(true)
+        try {
+            const { error } = await supabase
+                .from("app_settings")
+                .upsert({
+                    key: "disable_voting",
+                    value: checked,
+                    description: "Deshabilitar manualmente todas las votaciones"
+                }, { onConflict: "key" })
+
+            if (error) throw error
+
+            setDisableVoting(checked)
+            toast.success(checked ? "Votaciones DESHABILITADAS" : "Votaciones HABILITADAS")
+        } catch (error) {
+            console.error(error)
+            toast.error("Error al guardar configuración")
+            setDisableVoting(!checked)
+        } finally {
+            setUpdating(false)
+        }
+    }
+
     const handleDateChange = async (key: string, value: string) => {
         setUpdating(true)
         try {
@@ -206,6 +234,25 @@ export function SettingsManager() {
                         <Switch
                             checked={enableCurtain}
                             onCheckedChange={handleToggleCurtain}
+                            disabled={updating}
+                        />
+                    </div>
+                </div>
+
+                {/* Disable Voting */}
+                <div className="flex items-center justify-between space-x-4 rounded-lg border border-red-500/20 bg-red-500/5 p-4">
+                    <div className="space-y-0.5">
+                        <Label className="text-base font-semibold text-red-500">
+                            Deshabilitar Votaciones (Manual)
+                        </Label>
+                        <p className="text-sm text-muted-foreground">
+                            Cierra inmediatamente todas las votaciones en el sitio, ignorando las fechas programadas.
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                        <Switch
+                            checked={disableVoting}
+                            onCheckedChange={handleToggleDisableVoting}
                             disabled={updating}
                         />
                     </div>

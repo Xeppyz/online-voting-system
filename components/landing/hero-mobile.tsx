@@ -12,9 +12,10 @@ const avantiqueBold = localFont({
 
 interface HeroMobileProps {
     heroVideoUrl?: string | null
+    isForcedDisabled?: boolean
 }
 
-export function HeroMobile({ heroVideoUrl }: HeroMobileProps) {
+export function HeroMobile({ heroVideoUrl, isForcedDisabled = false }: HeroMobileProps) {
     return (
         <section className="relative w-full overflow-hidden bg-background pb-12">
             {/* 1. Header Image with Overlay */}
@@ -49,21 +50,30 @@ export function HeroMobile({ heroVideoUrl }: HeroMobileProps) {
                 </p>
 
                 <div className="flex justify-center pt-2">
-                    <Link href="/categorias">
+                    {!isForcedDisabled ? (
+                        <Link href="/categorias">
+                            <Button
+                                className={`px-8 h-12 rounded-full bg-[#3ffcff] text-black text-sm font-bold shadow-lg shadow-[#3ffcff]/20 hover:shadow-[#3ffcff]/40 transition-all hover:scale-105 ${avantiqueBold.className}`}
+                            >
+                                <div className="relative w-5 h-5 mr-3">
+                                    <Image
+                                        src="/icon/CHECKICON-8.png"
+                                        alt="Icon"
+                                        fill
+                                        className="object-contain"
+                                    />
+                                </div>
+                                Iniciar Votación
+                            </Button>
+                        </Link>
+                    ) : (
                         <Button
-                            className={`px-8 h-12 rounded-full bg-[#3ffcff] text-black text-sm font-bold shadow-lg shadow-[#3ffcff]/20 hover:shadow-[#3ffcff]/40 transition-all hover:scale-105 ${avantiqueBold.className}`}
+                            disabled
+                            className={`px-8 h-12 rounded-full bg-white/10 text-white/50 border border-white/10 text-sm font-bold cursor-not-allowed ${avantiqueBold.className}`}
                         >
-                            <div className="relative w-5 h-5 mr-3">
-                                <Image
-                                    src="/icon/CHECKICON-8.png"
-                                    alt="Icon"
-                                    fill
-                                    className="object-contain"
-                                />
-                            </div>
-                            Iniciar Votación
+                            Votación Cerrada
                         </Button>
-                    </Link>
+                    )}
                 </div>
             </div>
 

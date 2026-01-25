@@ -41,10 +41,11 @@ export default async function NomineePage({ params }: NomineePageProps) {
   const { data: settings } = await supabase
     .from("app_settings")
     .select("key, value")
-    .in("key", ["voting_start_date", "voting_end_date"])
+    .in("key", ["voting_start_date", "voting_end_date", "disable_voting"])
 
   const startDate = settings?.find((s) => s.key === "voting_start_date")?.value || null
   const endDate = settings?.find((s) => s.key === "voting_end_date")?.value || null
+  const disableVoting = settings?.find((s) => s.key === "disable_voting")?.value === true
 
   const now = new Date()
   const start = startDate ? new Date(startDate) : null
@@ -53,6 +54,7 @@ export default async function NomineePage({ params }: NomineePageProps) {
   let votingStatus: "active" | "upcoming" | "ended" = "active"
   if (start && start > now) votingStatus = "upcoming"
   if (end && end <= now) votingStatus = "ended"
+  if (disableVoting) votingStatus = "ended"
 
   return (
     <div className="min-h-screen bg-background">

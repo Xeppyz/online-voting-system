@@ -19,9 +19,10 @@ interface HeroSectionProps {
     votingEndDate?: string | null
     showCountdown?: boolean
     heroVideoUrl?: string | null
+    isForcedDisabled?: boolean
 }
 
-export function HeroSection({ votingStartDate, votingEndDate, showCountdown = true, heroVideoUrl }: HeroSectionProps) {
+export function HeroSection({ votingStartDate, votingEndDate, showCountdown = true, heroVideoUrl, isForcedDisabled = false }: HeroSectionProps) {
     const [timerTarget, setTimerTarget] = useState<Date | null>(null)
     const [timerTitle, setTimerTitle] = useState("")
     const [isVotingEnded, setIsVotingEnded] = useState(false)
@@ -68,6 +69,13 @@ export function HeroSection({ votingStartDate, votingEndDate, showCountdown = tr
             }
 
             if (end && now > end) {
+                setIsVotingEnded(true)
+                setShowVoteButton(false)
+                setTimerTarget(null)
+                return
+            }
+
+            if (isForcedDisabled) {
                 setIsVotingEnded(true)
                 setShowVoteButton(false)
                 setTimerTarget(null)

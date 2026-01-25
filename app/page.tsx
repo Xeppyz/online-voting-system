@@ -77,12 +77,13 @@ export default async function HomePage() {
   const { data: settings } = await supabase
     .from("app_settings")
     .select("key, value")
-    .in("key", ["voting_start_date", "voting_end_date", "show_hero_countdown"])
+    .in("key", ["voting_start_date", "voting_end_date", "show_hero_countdown", "disable_voting"])
 
   const startDate = settings?.find((s) => s.key === "voting_start_date")?.value || null
   const endDate = settings?.find((s) => s.key === "voting_end_date")?.value || null
   // Default to true if setting doesn't exist to maintain backward compatibility
   const showHeroCountdown = settings?.find((s) => s.key === "show_hero_countdown")?.value !== false
+  const disableVoting = settings?.find((s) => s.key === "disable_voting")?.value === true
 
   const now = new Date()
   const start = toNicaraguaTime(startDate)
@@ -91,6 +92,7 @@ export default async function HomePage() {
   let votingStatus: "active" | "upcoming" | "ended" = "active"
   if (start && start > now) votingStatus = "upcoming"
   if (end && end <= now) votingStatus = "ended"
+  if (disableVoting) votingStatus = "ended"
 
   return (
     <div className="min-h-screen bg-background bg-clik-16x9 bg-cover bg-center bg-fixed">
@@ -104,7 +106,7 @@ export default async function HomePage() {
 
 
         <div className="block md:hidden">
-          <HeroMobile />
+          <HeroMobile isForcedDisabled={disableVoting} />
         </div>
 
         <div className="hidden md:block">
@@ -113,6 +115,7 @@ export default async function HomePage() {
               votingStartDate={startDate}
               votingEndDate={endDate}
               showCountdown={showHeroCountdown}
+              isForcedDisabled={disableVoting}
             />
           </ScrollAnimation>
         </div>
