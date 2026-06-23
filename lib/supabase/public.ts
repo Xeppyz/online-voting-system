@@ -1,8 +1,12 @@
-import { createClient } from "@supabase/supabase-js"
+import { createMockSupabaseClient, createRealSupabaseClient, isSupabaseMockMode } from "./mock"
 
 export function createPublicClient() {
-    return createClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-    )
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() || ""
+    const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() || ""
+
+    if (isSupabaseMockMode()) {
+        return createMockSupabaseClient()
+    }
+
+    return createRealSupabaseClient(url, anonKey)
 }

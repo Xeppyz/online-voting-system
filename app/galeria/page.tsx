@@ -36,39 +36,43 @@ export default async function GalleryPage() {
                     </div>
                 ) : (
                     <div className="columns-1 md:columns-2 lg:columns-3 gap-6 space-y-6">
-                        {items.map((item) => (
-                            <div key={item.id} className="break-inside-avoid group relative rounded-xl overflow-hidden bg-white/5 border border-white/10 hover:border-primary/50 transition-all duration-300">
-                                {item.media_type === 'video' ? (
-                                    <div className="relative aspect-video">
-                                        <video
-                                            src={item.media_url}
-                                            className="w-full h-full object-cover"
-                                            controls
-                                            preload="metadata"
-                                        />
-                                    </div>
-                                ) : (
-                                    <div className="relative">
-                                        <Image
-                                            src={item.media_url}
-                                            alt={item.title}
-                                            width={800}
-                                            height={600}
-                                            className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
-                                            unoptimized
-                                        />
-                                    </div>
-                                )}
+                        {items.map((item) => {
+                            const mediaUrl = item.media_url || "/icon/ISOTIPOCLIK512PX.png"
 
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none flex flex-col justify-end p-6">
-                                    <h3 className="text-lg font-bold text-white mb-1">{item.title}</h3>
-                                    <p className="text-sm text-primary flex items-center gap-2 font-medium">
-                                        <Calendar className="w-3 h-3" />
-                                        {new Date(item.published_at).toLocaleDateString()}
-                                    </p>
+                            return (
+                                <div key={item.id} className="break-inside-avoid group relative rounded-xl overflow-hidden bg-white/5 border border-white/10 hover:border-primary/50 transition-all duration-300">
+                                    {item.media_type === 'video' ? (
+                                        <div className="relative aspect-video">
+                                            <video
+                                                src={mediaUrl}
+                                                className="w-full h-full object-cover"
+                                                controls
+                                                preload="metadata"
+                                            />
+                                        </div>
+                                    ) : (
+                                        <div className="relative">
+                                            <Image
+                                                src={mediaUrl}
+                                                alt={item.title || "Contenido de la galería"}
+                                                width={800}
+                                                height={600}
+                                                className="w-full h-auto object-cover transition-transform duration-500 group-hover:scale-105"
+                                                unoptimized
+                                            />
+                                        </div>
+                                    )}
+
+                                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none flex flex-col justify-end p-6">
+                                        <h3 className="text-lg font-bold text-white mb-1">{item.title}</h3>
+                                        <p className="text-sm text-primary flex items-center gap-2 font-medium">
+                                            <Calendar className="w-3 h-3" />
+                                            {new Date(item.published_at).toLocaleDateString()}
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
-                        ))}
+                            )
+                        })}
                     </div>
                 )}
             </main>
